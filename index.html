@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dr. Rabia's Dental Care — Clinic Management Portal</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            clinical: {
+              navy: '#0f172a',
+              card: '#ffffff',
+              border: '#e2e8f0',
+              bg: '#f8fafc'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18 & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Dr. Rabia's Official Google Maps URL for Tindivanam
+    const DR_RABIA_MAPS_URL = "https://maps.app.goo.gl/tfGJDqvsVLSDXF8f9";
+
+    // Initial Pre-loaded Data
+    const INITIAL_PATIENTS = [
+      {
+        id: "p1",
+        name: "Suresh Kumar",
+        phone: "9876543210",
+        age: 38,
+        gender: "Male",
+        medicalHistory: "Mild Hypertension",
+        complaint: "Severe pain in lower right molar (Tooth #46)",
+        visits: [
+          {
+            date: "04 Oct, 2026",
+            procedure: "Single-Sitting RCT",
+            tooth: "46",
+            notes: "Canal extirpation completed. Temporary dressing placed. Mild tenderness expected.",
+            prescription: "Amoxicillin 500mg, Ketorol-DT SOS"
+          }
+        ]
+      },
+      {
+        id: "p2",
+        name: "Priya Sharma",
+        phone: "9840123456",
+        age: 29,
+        gender: "Female",
+        medicalHistory: "None",
+        complaint: "Wisdom tooth impingement & pericoronitis",
+        visits: [
+          {
+            date: "05 Oct, 2026",
+            procedure: "Surgical Extraction",
+            tooth: "38",
+            notes: "Surgical extraction with 1 suture. Pressure pack placed.",
+            prescription: "Zerodol-SP BD x 3 days, Chlorohexidine mouthwash"
+          }
+        ]
+      },
+      {
+        id: "p3",
+        name: "Anita Raman",
+        phone: "9363403175",
+        age: 44,
+        gender: "Female",
+        medicalHistory: "Type 2 Diabetic",
+        complaint: "Calculus buildup, bleeding gums",
+        visits: [
+          {
+            date: "15 Apr, 2026",
+            procedure: "Ultrasonic Scaling",
+            tooth: "Full Mouth",
+            notes: "Deep supragingival calculus removed. Advised 6-month recall.",
+            prescription: "Hexidine mouth rinse, Sensodyne toothpaste"
+          }
+        ]
+      }
+    ];
+
+    const INITIAL_REMINDERS = [
+      {
+        id: "rem-1",
+        patientName: "Suresh Kumar",
+        phone: "9876543210",
+        type: "Next-Sitting Reminder (2h before)",
+        timing: "Due Now",
+        status: "Pending",
+        message: "Dr. Rabia's Dental Care, Tindivanam: Hello Suresh, reminder for your RCT Sitting 2 today at 11:30 AM with Dr. Rabia. Kindly be on time."
+      },
+      {
+        id: "rem-2",
+        patientName: "Priya Sharma",
+        phone: "9840123456",
+        type: "Post-Op Care Check-in (6h post-op)",
+        timing: "Due at 6:00 PM",
+        status: "Pending",
+        message: "Dr. Rabia's Dental Care: Hello Priya, Dr. Rabia hopes you are comfortable after your extraction. Avoid spitting or hot drinks today. Contact clinic if pain persists."
+      },
+      {
+        id: "rem-3",
+        patientName: "Anita Raman",
+        phone: "9363403175",
+        type: "6-Month Dental Checkup Recall",
+        timing: "Due Today",
+        status: "Pending",
+        message: "Dr. Rabia's Dental Care: Hello Anita, it has been 6 months since your last scaling. Keep your gums healthy by scheduling a routine checkup."
+      }
+    ];
+
+    const POST_OP_PRESETS = {
+      "Surgical Extraction": "1. Keep the gauze pack pressed firmly for 45 minutes.\n2. Do NOT spit, suck with a straw, or smoke for 24 hours.\n3. Consume only cool/soft foods today.\n4. Take prescribed medicines strictly after food.",
+      "Single-Sitting RCT": "1. Avoid chewing hard foods on the treated side for 48 hours.\n2. Mild soreness or tenderness is completely normal.\n3. Complete the prescribed antibiotic course as directed.",
+      "Dental Implant": "1. Maintain soft diet for 48 hours.\n2. Do not touch or disturb the surgical site with tongue or fingers.\n3. Apply cold pack externally on cheek if minor swelling occurs.",
+      "Ultrasonic Scaling": "1. Mild sensitivity to hot and cold is temporary and resolves in 24 hours.\n2. Use prescribed warm saline or mouthwash rinses starting tomorrow.",
+      "Crown Cementation": "1. Do not chew hard or sticky foods on the new crown for 24 hours.\n2. Floss normally around the tooth margins."
+    };
+
+    function App() {
+      const [activeTab, setActiveTab] = useState(1);
+      const [role, setRole] = useState("Doctor");
+      const [patients, setPatients] = useState(() => {
+        const local = localStorage.getItem("rabia_patients");
+        return local ? JSON.parse(local) : INITIAL_PATIENTS;
+      });
+      const [reminders, setReminders] = useState(() => {
+        const local = localStorage.getItem("rabia_reminders");
+        return local ? JSON.parse(local) : INITIAL_REMINDERS;
+      });
+      const [webhookUrl, setWebhookUrl] = useState(() => {
+        return localStorage.getItem("rabia_sms_webhook") || "";
+      });
+      const [toast, setToast] = useState(null);
+
+      // Search state
+      const [searchQuery, setSearchQuery] = useState("");
+      const [selectedPatient, setSelectedPatient] = useState(null);
+
+      // New Patient Form
+      const [newPatient, setNewPatient] = useState({ name: "", phone: "", age: "", gender: "Male", medicalHistory: "", complaint: "" });
+
+      // Post-Op Log Form
+      const [postOpData, setPostOpData] = useState({
+        patientId: "",
+        procedure: "Single-Sitting RCT",
+        tooth: "",
+        notes: "",
+        prescription: "",
+        customGuidelines: POST_OP_PRESETS["Single-Sitting RCT"]
+      });
+
+      // Save to localStorage
+      useEffect(() => {
+        localStorage.setItem("rabia_patients", JSON.stringify(patients));
+      }, [patients]);
+
+      useEffect(() => {
+        localStorage.setItem("rabia_reminders", JSON.stringify(reminders));
+      }, [reminders]);
+
+      useEffect(() => {
+        localStorage.setItem("rabia_sms_webhook", webhookUrl);
+      }, [webhookUrl]);
+
+      useEffect(() => {
+        if (window.lucide) window.lucide.createIcons();
+      });
+
+      const showToast = (msg, type = "success") => {
+        setToast({ msg, type });
+        setTimeout(() => setToast(null), 4500);
+      };
+
+      // Add New Patient
+      const handleAddPatient = (e) => {
+        e.preventDefault();
+        if (!newPatient.name || !newPatient.phone) {
+          showToast("Name and Phone are required", "error");
+          return;
+        }
+        const created = {
+          id: "p_" + Date.now(),
+          ...newPatient,
+          visits: []
+        };
+        setPatients([created, ...patients]);
+        setNewPatient({ name: "", phone: "", age: "", gender: "Male", medicalHistory: "", complaint: "" });
+        showToast("Patient record added successfully!");
+      };
+
+      // Handle Post-Op Log Submission
+      const handleLogPostOp = (e) => {
+        e.preventDefault();
+        const patient = patients.find(p => p.id === postOpData.patientId);
+        if (!patient) {
+          showToast("Please select a patient", "error");
+          return;
+        }
+
+        const newVisit = {
+          date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          procedure: postOpData.procedure,
+          tooth: postOpData.tooth || "N/A",
+          notes: postOpData.notes || "Procedure completed successfully.",
+          prescription: postOpData.prescription || "Standard analgesics prescribed."
+        };
+
+        const updatedPatients = patients.map(p => {
+          if (p.id === patient.id) {
+            return { ...p, visits: [newVisit, ...p.visits] };
+          }
+          return p;
+        });
+
+        const newReminder = {
+          id: "rem_" + Date.now(),
+          patientName: patient.name,
+          phone: patient.phone,
+          type: "Post-Op Follow-up (Auto-Queued)",
+          timing: "Scheduled +6h",
+          status: "Pending",
+          message: `Dr. Rabia's Dental Care: Hello ${patient.name}, Dr. Rabia hopes you are recovering comfortably from your ${postOpData.procedure}. Notes: ${postOpData.customGuidelines}`
+        };
+
+        setPatients(updatedPatients);
+        setReminders([newReminder, ...reminders]);
+        showToast("Treatment and Post-Op instructions logged!");
+      };
+
+      // WhatsApp Trigger
+      const sendWhatsApp = (phone, text) => {
+        const cleanPhone = phone.replace(/[^0-9]/g, '');
+        const target = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+        window.open(`https://wa.me/${target}?text=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      // Native Device SMS Protocol
+      const sendNativeSMS = (phone, text, remId) => {
+        if (remId) {
+          const updated = reminders.map(r => r.id === remId ? { ...r, status: "Sent", timing: "Sent just now" } : r);
+          setReminders(updated);
+        }
+        showToast(`Opening mobile SMS app for ${phone}...`);
+        window.location.href = `sms:${phone}?body=${encodeURIComponent(text)}`;
+      };
+
+      const filteredPatients = patients.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        p.phone.includes(searchQuery)
+      );
+
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+          
+          {/* Top Bar */}
+          <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-teal-600 text-white p-2 rounded-xl shadow-sm">
+                  <i data-lucide="cross" className="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h1 className="font-bold text-lg leading-tight text-slate-900">Dr. Rabia's Dental Care</h1>
+                  <p className="text-xs text-slate-500 font-medium">Tindivanam Clinic Management Portal</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline-block text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+                  ● Portal Active
+                </span>
+                <button 
+                  onClick={() => setRole(role === "Doctor" ? "Receptionist" : "Doctor")}
+                  className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg border border-slate-300 transition"
+                >
+                  View: <span className="text-teal-700">{role}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="max-w-6xl mx-auto px-4 flex gap-1 sm:gap-4 overflow-x-auto text-sm font-semibold border-t border-slate-100">
+              {[
+                { id: 1, label: "Overview", icon: "layout-dashboard" },
+                { id: 2, label: "Patients", icon: "users" },
+                { id: 3, label: "Post-Op & Logs", icon: "clipboard-plus" },
+                { id: 4, label: "Reminders & Alerts", icon: "bell", badge: reminders.filter(r => r.status === 'Pending').length },
+                { id: 5, label: "Google Reviews", icon: "star" }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-3 px-3 border-b-2 flex items-center gap-2 whitespace-nowrap transition ${
+                    activeTab === tab.id 
+                      ? 'border-teal-600 text-teal-700 bg-teal-50/50' 
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <i data-lucide={tab.icon} className="w-4 h-4"></i>
+                  <span>{tab.label}</span>
+                  {tab.badge > 0 && (
+                    <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </header>
+
+          {/* Toast Notification */}
+          {toast && (
+            <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 border border-slate-700 text-sm">
+              <i data-lucide="check-circle" className="w-5 h-5 text-teal-400"></i>
+              <span>{toast.msg}</span>
+            </div>
+          )}
+
+          {/* Main Content Area */}
+          <main className="max-w-6xl mx-auto w-full p-4 sm:p-6 flex-1">
+            
+            {/* TAB 1: OVERVIEW */}
+            {activeTab === 1 && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p className="text-xs text-slate-500 font-semibold uppercase">Total Patients</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">{patients.length}</p>
+                    <span className="text-[11px] text-teal-600 font-medium">In Tindivanam database</span>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p className="text-xs text-slate-500 font-semibold uppercase">Pending Alerts</p>
+                    <p className="text-2xl font-bold text-amber-600 mt-1">
+                      {reminders.filter(r => r.status === 'Pending').length}
+                    </p>
+                    <span className="text-[11px] text-amber-700 font-medium">Require dispatch</span>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p className="text-xs text-slate-500 font-semibold uppercase">Post-Op Logged</p>
+                    <p className="text-2xl font-bold text-teal-700 mt-1">
+                      {patients.reduce((acc, p) => acc + p.visits.length, 0)}
+                    </p>
+                    <span className="text-[11px] text-teal-600 font-medium">Total procedures</span>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p className="text-xs text-slate-500 font-semibold uppercase">Google Maps Rating</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">4.9 ★</p>
+                    <span className="text-[11px] text-emerald-600 font-medium">Tindivanam Clinic</span>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <h3 className="text-base font-bold text-slate-900 mb-3 flex items-center justify-between">
+                    <span>Recent Post-Op Treatments</span>
+                    <button onClick={() => setActiveTab(3)} className="text-xs text-teal-700 hover:underline">Log New Procedure →</button>
+                  </h3>
+                  <div className="divide-y divide-slate-100">
+                    {patients.flatMap(p => p.visits.map(v => ({ ...v, patientName: p.name, patientPhone: p.phone }))).slice(0, 4).map((visit, idx) => (
+                      <div key={idx} className="py-3 flex items-center justify-between text-sm">
+                        <div>
+                          <p className="font-semibold text-slate-900">{visit.patientName} — <span className="text-teal-700">{visit.procedure}</span></p>
+                          <p className="text-xs text-slate-500">Tooth: #{visit.tooth} | Date: {visit.date}</p>
+                        </div>
+                        <button 
+                          onClick={() => sendWhatsApp(visit.patientPhone, `Dr. Rabia's Dental Care: Hello ${visit.patientName}, here are your post-care instructions from Dr. Rabia:\n\n${visit.notes}\n\nPrescription: ${visit.prescription}`)}
+                          className="px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                        >
+                          <i data-lucide="message-square" className="w-3.5 h-3.5"></i>
+                          Send Post-Op (WhatsApp)
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: PATIENTS DIRECTORY */}
+            {activeTab === 2 && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-4">
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      placeholder="Search patient by name or phone..." 
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                    />
+                    <i data-lucide="search" className="w-4 h-4 text-slate-400 absolute left-3 top-3.5"></i>
+                  </div>
+
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm divide-y divide-slate-100 overflow-hidden">
+                    {filteredPatients.map(pt => (
+                      <div 
+                        key={pt.id} 
+                        onClick={() => setSelectedPatient(pt)}
+                        className={`p-4 hover:bg-slate-50 cursor-pointer transition flex items-center justify-between ${selectedPatient?.id === pt.id ? 'bg-teal-50/70 border-l-4 border-teal-600' : ''}`}
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900">{pt.name}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">{pt.gender}, {pt.age}y</span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1">📞 {pt.phone} | History: {pt.medicalHistory || "None"}</p>
+                          <p className="text-xs text-teal-700 font-medium mt-0.5">Visits logged: {pt.visits.length}</p>
+                        </div>
+                        <i data-lucide="chevron-right" className="w-5 h-5 text-slate-400"></i>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  {selectedPatient ? (
+                    <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between border-b pb-3">
+                        <h3 className="font-bold text-slate-900">Patient File</h3>
+                        <button onClick={() => setSelectedPatient(null)} className="text-xs text-slate-500 hover:text-slate-800">Close ✕</button>
+                      </div>
+                      <div>
+                        <p className="text-lg font-bold text-slate-900">{selectedPatient.name}</p>
+                        <p className="text-xs text-slate-500">Phone: {selectedPatient.phone} | Age: {selectedPatient.age}</p>
+                        <p className="text-xs text-slate-600 mt-2 font-medium">Chief Complaint: <span className="text-slate-800">{selectedPatient.complaint}</span></p>
+                      </div>
+
+                      <div className="border-t pt-3">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Visit History</h4>
+                        <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                          {selectedPatient.visits.length === 0 ? (
+                            <p className="text-xs text-slate-400 italic">No past visits recorded.</p>
+                          ) : (
+                            selectedPatient.visits.map((v, i) => (
+                              <div key={i} className="text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-200 space-y-1">
+                                <div className="flex justify-between font-semibold text-slate-800">
+                                  <span>{v.procedure} (Tooth #{v.tooth})</span>
+                                  <span className="text-slate-400">{v.date}</span>
+                                </div>
+                                <p className="text-slate-600">{v.notes}</p>
+                                <p className="text-teal-700 font-medium">Rx: {v.prescription}</p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleAddPatient} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                      <h3 className="font-bold text-slate-900 text-sm border-b pb-2 flex items-center gap-2">
+                        <i data-lucide="user-plus" className="w-4 h-4 text-teal-600"></i>
+                        Register New Patient
+                      </h3>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600">Patient Full Name</label>
+                        <input 
+                          type="text" 
+                          required
+                          value={newPatient.name} 
+                          onChange={e => setNewPatient({ ...newPatient, name: e.target.value })}
+                          className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
+                          placeholder="e.g. Ramesh V"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600">Phone (10 digits)</label>
+                          <input 
+                            type="tel" 
+                            required
+                            value={newPatient.phone} 
+                            onChange={e => setNewPatient({ ...newPatient, phone: e.target.value })}
+                            className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
+                            placeholder="9363403175"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600">Age</label>
+                          <input 
+                            type="number" 
+                            value={newPatient.age} 
+                            onChange={e => setNewPatient({ ...newPatient, age: e.target.value })}
+                            className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
+                            placeholder="32"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600">Medical Notes / Allergies</label>
+                        <input 
+                          type="text" 
+                          value={newPatient.medicalHistory} 
+                          onChange={e => setNewPatient({ ...newPatient, medicalHistory: e.target.value })}
+                          className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
+                          placeholder="e.g. Penicillin allergy, Diabetic"
+                        />
+                      </div>
+                      <button 
+                        type="submit" 
+                        className="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition shadow-sm"
+                      >
+                        + Save Patient Record
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: POST-OP CARE */}
+            {activeTab === 3 && (
+              <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="clipboard-check" className="w-5 h-5 text-teal-600"></i>
+                    Post-Operative Treatment Log
+                  </h3>
+                  <p className="text-xs text-slate-500">Log procedures and instantly dispatch standardized post-care guidelines to the patient's phone.</p>
+                </div>
+
+                <form onSubmit={handleLogPostOp} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700">Select Patient</label>
+                      <select 
+                        required
+                        value={postOpData.patientId} 
+                        onChange={e => setPostOpData({ ...postOpData, patientId: e.target.value })}
+                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 bg-white"
+                      >
+                        <option value="">-- Choose Patient --</option>
+                        {patients.map(p => (
+                          <option key={p.id} value={p.id}>{p.name} ({p.phone})</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700">Procedure Performed</label>
+                      <select 
+                        value={postOpData.procedure} 
+                        onChange={e => {
+                          const proc = e.target.value;
+                          setPostOpData({ 
+                            ...postOpData, 
+                            procedure: proc, 
+                            customGuidelines: POST_OP_PRESETS[proc] || "" 
+                          });
+                        }}
+                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 bg-white"
+                      >
+                        {Object.keys(POST_OP_PRESETS).map(proc => (
+                          <option key={proc} value={proc}>{proc}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700">Treated Tooth #(s)</label>
+                      <input 
+                        type="text" 
+                        value={postOpData.tooth} 
+                        onChange={e => setPostOpData({ ...postOpData, tooth: e.target.value })}
+                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs" 
+                        placeholder="e.g. 46, 47"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-xs font-semibold text-slate-700">Prescription / Medications</label>
+                      <input 
+                        type="text" 
+                        value={postOpData.prescription} 
+                        onChange={e => setPostOpData({ ...postOpData, prescription: e.target.value })}
+                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs" 
+                        placeholder="e.g. Tab Zerodol-SP 1 BD x 3 days"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700">Automated Post-Op Care Guidelines</label>
+                    <textarea 
+                      rows="4" 
+                      value={postOpData.customGuidelines} 
+                      onChange={e => setPostOpData({ ...postOpData, customGuidelines: e.target.value })}
+                      className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs text-slate-700 font-mono focus:ring-2 focus:ring-teal-500"
+                    ></textarea>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button 
+                      type="submit" 
+                      className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+                    >
+                      Save Treatment & Queue Post-Op Alert
+                    </button>
+                    {postOpData.patientId && (
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const patient = patients.find(p => p.id === postOpData.patientId);
+                          if (patient) {
+                            sendWhatsApp(patient.phone, `Dr. Rabia's Dental Care - Post-Op Instructions:\n\nCare notes for ${postOpData.procedure}:\n${postOpData.customGuidelines}\n\nPrescription: ${postOpData.prescription || 'As advised'}`);
+                          }
+                        }}
+                        className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition"
+                      >
+                        <i data-lucide="send" className="w-4 h-4"></i>
+                        Send via WhatsApp
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* TAB 4: REMINDERS & ALERTS QUEUE */}
+            {activeTab === 4 && (
+              <div className="space-y-4">
+                
+                {/* Cloud SMS Gateway Hook Config (Optional) */}
+                <div className="bg-slate-100 p-3 rounded-xl border border-slate-200 text-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <i data-lucide="settings" className="w-4 h-4 text-slate-500"></i>
+                    <span className="text-slate-700 font-semibold">Automated SMS Gateway (Optional):</span>
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Paste Make.com Webhook URL (Leave empty for Native Mobile SMS)" 
+                    value={webhookUrl}
+                    onChange={e => setWebhookUrl(e.target.value)}
+                    className="flex-1 max-w-md p-1.5 px-3 rounded-lg border border-slate-300 text-xs bg-white focus:ring-1 focus:ring-teal-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">Automated Reminders & Alerts Queue</h3>
+                    <p className="text-xs text-slate-500">Scheduled alarms for upcoming appointments, next sittings, and routine checkups.</p>
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    Pending: <span className="font-bold text-amber-600">{reminders.filter(r => r.status === 'Pending').length}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {reminders.map(rem => (
+                    <div 
+                      key={rem.id} 
+                      className={`p-4 rounded-xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                        rem.status === 'Pending' ? 'bg-white border-amber-200 shadow-sm' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-900 text-sm">{rem.patientName}</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            rem.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                          }`}>
+                            {rem.status}
+                          </span>
+                        </div>
+                        <p className="text-xs font-medium text-teal-700 mt-0.5">{rem.type}</p>
+                        <p className="text-xs text-slate-600 mt-1 max-w-xl">"{rem.message}"</p>
+                        <p className="text-[11px] text-slate-400 mt-1">Scheduled for: {rem.timing} • 📞 {rem.phone}</p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {/* Direct Native SMS button */}
+                        <button 
+                          onClick={() => sendNativeSMS(rem.phone, rem.message, rem.id)}
+                          title="Opens native device SMS app immediately"
+                          className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                        >
+                          <i data-lucide="smartphone" className="w-3.5 h-3.5"></i>
+                          Direct SMS (Mobile)
+                        </button>
+
+                        {/* WhatsApp button */}
+                        <button 
+                          onClick={() => sendWhatsApp(rem.phone, rem.message)}
+                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                        >
+                          <i data-lucide="share-2" className="w-3.5 h-3.5"></i>
+                          WhatsApp
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 5: GOOGLE REVIEW BOOSTER */}
+            {activeTab === 5 && (
+              <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="star" className="w-5 h-5 text-amber-500"></i>
+                    Google Maps Review Growth Engine
+                  </h3>
+                  <p className="text-xs text-slate-500">Directly addresses Dr. Rabia's low review count in Tindivanam by prompting satisfied patients immediately after procedures.</p>
+                </div>
+
+                <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-2">
+                  <p className="font-bold flex items-center gap-1.5">
+                    <i data-lucide="map-pin" className="w-4 h-4 text-amber-600"></i>
+                    Verified Tindivanam Clinic Review Link:
+                  </p>
+                  <p className="font-mono text-[11px] bg-white p-2 rounded border border-amber-200 select-all overflow-x-auto">
+                    {DR_RABIA_MAPS_URL}
+                  </p>
+                  <p className="italic text-[11px] mt-1 text-slate-600">When clicked, this opens Dr. Rabia's official Google Maps listing without 404 connection errors.</p>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Patients Ready for 5-Star Invite</p>
+                  {patients.map(p => {
+                    const reviewText = `Hello ${p.name}, thank you for choosing Dr. Rabia's Dental Care in Tindivanam. If you had a gentle experience with Dr. Rabia, please take 10 seconds to share your review on Google: ${DR_RABIA_MAPS_URL}`;
+                    return (
+                      <div key={p.id} className="py-3 flex items-center justify-between text-xs">
+                        <div>
+                          <p className="font-bold text-slate-900">{p.name}</p>
+                          <p className="text-slate-500">📞 {p.phone}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => sendNativeSMS(p.phone, reviewText)}
+                            className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold flex items-center gap-1 transition"
+                          >
+                            <i data-lucide="smartphone" className="w-3.5 h-3.5"></i>
+                            SMS Invite
+                          </button>
+                          <button 
+                            onClick={() => sendWhatsApp(p.phone, reviewText)}
+                            className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold flex items-center gap-1 transition"
+                          >
+                            <i data-lucide="send" className="w-3.5 h-3.5"></i>
+                            WhatsApp
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+          </main>
+
+          {/* Footer Branding */}
+          <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
+            Clinical System Architected & Powered by <strong className="text-slate-700">Nexus Digital Hub</strong> (+91 9363403175)
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
