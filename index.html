@@ -4,32 +4,107 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dr. Rabia's Dental Care — Clinic Management Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;600;700&display=swap');
-body { font-family: 'Plus Jakarta Sans', 'Noto Sans Tamil', sans-serif; background: #f8fafc; margin: 0; }
-.ta { font-family: 'Noto Sans Tamil', 'Plus Jakarta Sans', sans-serif; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-#reception-rx-sheet { display: none; }
-
-@media print {
-  @page { size: A4 portrait; margin: 10mm; }
-  html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
-  .app-chrome { display: none !important; }
-  #reception-rx-sheet {
-    display: block !important;
-    position: static !important;
-    width: 100% !important;
-    background: #fff !important;
-    color: #000 !important;
-    page-break-inside: avoid !important;
-  }
+:root{
+  --ink:#0f1c2e; --ink2:#46566b; --mute:#7b8a9e; --line:#e1e7ef; --bg:#f3f5f9; --nav:#0c2036; --nav2:#09182a;
+  --acc:#0f766e; --acc2:#0b5e58; --accbg:#e5f3f1; --warn:#9a5b0a; --warnbg:#fdf5e4; --warnln:#f0d9a8;
+  --danger:#b42318; --dangerbg:#fdecea; --dangerln:#f3c3be; --ok:#066a43; --okbg:#e6f5ed; --okln:#b5dfc7;
 }
+*{box-sizing:border-box}
+body{font-family:'Inter','Noto Sans Tamil',system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0;font-feature-settings:"tnum" 1,"cv11" 1;-webkit-font-smoothing:antialiased}
+.ta{font-family:'Noto Sans Tamil','Inter',sans-serif}
+.no-scrollbar::-webkit-scrollbar{display:none}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+/* Surfaces */
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 2px rgba(15,28,46,.04)}
+.card-h{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-t{font-size:14px;font-weight:600;color:var(--ink)}
+.card-b{padding:18px}
+.sub{font-size:12px;color:var(--mute)}
+.well{background:#f7f9fc;border:1px solid var(--line);border-radius:8px}
+.divide>*+*{border-top:1px solid var(--line)}
+.rowh:hover{background:#f7f9fc}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:0 13px;border-radius:7px;font-size:12.5px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;line-height:1}
+.btn:active{transform:translateY(1px)}
+.btn-lg{min-height:46px;font-size:13.5px;padding:0 20px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:var(--acc2)}
+.btn-d{background:var(--nav);color:#fff}.btn-d:hover{background:#13304f}
+.btn-o{background:#fff;color:var(--ink);border-color:#cdd6e2}.btn-o:hover{border-color:var(--acc);color:var(--acc)}
+.btn-wa{background:#fff;color:var(--ok);border-color:var(--okln)}.btn-wa:hover{background:var(--okbg)}
+.btn-ok{background:var(--ok);color:#fff}.btn-ok:hover{background:#05583a}
+.btn-r{background:#fff;color:var(--danger);border-color:var(--dangerln)}.btn-r:hover{background:var(--dangerbg)}
+.btn-rec{background:var(--danger);color:#fff}.btn-rec:hover{background:#951c13}
+.btn-link{background:none;border:0;color:var(--acc);font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:2px 0}
+.btn-link:hover{text-decoration:underline}
+.chip{min-height:34px;padding:0 11px;border-radius:7px;border:1px solid #cdd6e2;background:#fff;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--acc)}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc2)}
+
+/* Forms */
+.lbl{font-size:12px;font-weight:600;color:var(--ink2)}
+.inp{width:100%;margin-top:5px;padding:9px 11px;border:1px solid #cdd6e2;border-radius:7px;font-size:13px;background:#fff;color:var(--ink);font-family:inherit}
+.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(15,118,110,.14);outline:none}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid transparent;line-height:1.5}
+.b-n{background:#eef2f7;color:var(--ink2);border-color:#dde4ee}
+.b-a{background:var(--accbg);color:var(--acc2);border-color:#bfe0dc}
+.b-w{background:var(--warnbg);color:var(--warn);border-color:var(--warnln)}
+.b-d{background:var(--dangerbg);color:var(--danger);border-color:var(--dangerln)}
+.b-o{background:var(--okbg);color:var(--ok);border-color:var(--okln)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* Shell */
+.sidebar{width:252px;background:linear-gradient(180deg,var(--nav),var(--nav2));color:#b6c6da;position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:30}
+.main{margin-left:252px;min-height:100vh;display:flex;flex-direction:column}
+.navbtn{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:500;color:#a9bbd0;background:none;border:0;cursor:pointer;text-align:left;transition:background .15s,color .15s}
+.navbtn:hover{background:rgba(255,255,255,.06);color:#fff}
+.navbtn.on{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 3px 0 0 #2dd4bf}
+.navcount{margin-left:auto;background:#f0b44c;color:#3a2603;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px}
+.mnav{display:none}
+.topbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+@media(max-width:1023px){
+  .sidebar{display:none}.main{margin-left:0}
+  .mnav{display:flex}
+}
+.mtab{display:flex;align-items:center;gap:7px;padding:11px 12px;font-size:12.5px;font-weight:600;color:var(--mute);border:0;border-bottom:2px solid transparent;background:none;white-space:nowrap;cursor:pointer}
+.mtab.on{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* Odontogram */
+.tooth{width:34px;height:46px;border-radius:6px;border:1px solid #c5cfdc;background:#fff;color:var(--ink2);font-size:11.5px;font-weight:500;cursor:pointer;transition:all .12s}
+.tooth:hover{border-color:var(--acc)}
+.tooth.rct{background:#fdf1d6;border-color:#e0a93a;color:#6b4306;font-weight:700}
+.tooth.car{background:#fbe0dd;border-color:#e0766b;color:#8a1f15;font-weight:700}
+.tooth.ext{background:#e8ecf2;border:1px dashed #98a5b8;color:#98a5b8;text-decoration:line-through}
+.tooth.trt{background:#e5f3f1;border-color:#8cc9c2;color:var(--acc2);font-weight:600}
+.tooth.on{background:var(--acc);border-color:var(--acc2);color:#fff;font-weight:700;box-shadow:0 2px 6px rgba(15,118,110,.35)}
+@media(max-width:420px){.tooth{width:29px;height:42px;font-size:10.5px}}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;border:1px solid #98a5b8;margin-right:5px;vertical-align:-1px}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;background:rgba(9,24,42,.58);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
+.toast{position:fixed;bottom:22px;right:22px;z-index:60;background:var(--nav);color:#fff;padding:11px 16px;border-radius:9px;box-shadow:0 8px 24px rgba(9,24,42,.3);font-size:13px;display:flex;align-items:center;gap:9px}
+
+#reception-rx-sheet{display:none}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  html,body{background:#fff !important;margin:0 !important;padding:0 !important}
+  .app-chrome{display:none !important}
+  #reception-rx-sheet{display:block !important;position:static !important;width:100% !important;background:#fff !important;color:#000 !important;page-break-inside:avoid !important}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
 </head>
 <body>
@@ -49,6 +124,58 @@ const TEETH = {
   ur: [18,17,16,15,14,13,12,11], ul: [21,22,23,24,25,26,27,28],
   lr: [48,47,46,45,44,43,42,41], ll: [31,32,33,34,35,36,37,38]
 };
+
+// --- IndexedDB for Audio Storage (Bypasses 5MB LocalStorage Limit) ---
+const DB_NAME = "RabiaClinicDB_v1";
+const STORE_NAME = "audioMemos";
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveAudioToDB(id, blob) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      tx.objectStore(STORE_NAME).put(blob, id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) {
+    console.error("IndexedDB save error", e);
+  }
+}
+
+async function getAudioFromDB(id) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const req = tx.objectStore(STORE_NAME).get(id);
+      req.onsuccess = () => {
+        if (req.result) {
+          resolve(URL.createObjectURL(req.result));
+        } else {
+          resolve(null);
+        }
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch (e) {
+    return null;
+  }
+}
 
 const DEFAULT_CATS = {
   "Oral & Maxillofacial Surgery": [
@@ -307,9 +434,65 @@ const composition = (m) => (m && m.genericSalt) ? m.genericSalt : (m ? m.brandNa
 const isCombo = (m) => ((m && m.genericSalt) || "").includes(" + ");
 const doseStr = (m, sep = "-") => m ? [m.m, m.a, m.n].map(x => (x ? 1 : 0)).join(sep) : "1-0-1";
 
+/* ---------- Stroke icon set (no emoji) ---------- */
+const ICONS = {
+  overview: "M3 3h7v9H3z M14 3h7v5h-7z M14 12h7v9h-7z M3 16h7v5H3z",
+  calendar: "M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
+  users: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75",
+  pulse: "M22 12h-4l-3 9L9 3l-3 9H2",
+  bell: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0",
+  star: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z",
+  logout: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9",
+  search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.35-4.35",
+  printer: "M6 9V2h12v7 M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2 M6 14h12v8H6z",
+  phone: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z",
+  alert: "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01",
+  check: "M20 6L9 17l-5-5",
+  x: "M18 6L6 18 M6 6l12 12",
+  mic: "M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z M19 10v2a7 7 0 0 1-14 0v-2 M12 19v4 M8 23h8",
+  stop: "M6 6h12v12H6z",
+  plus: "M12 5v14 M5 12h14",
+  arrow: "M5 12h14 M12 5l7 7-7 7",
+  eye: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  message: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+  send: "M22 2L11 13 M22 2l-7 20-4-9-9-4 20-7z",
+  shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M12 8v6 M9 11h6",
+  lock: "M5 11h14v10H5z M8 11V7a4 4 0 0 1 8 0v4",
+  clipboard: "M9 2h6v4H9z M7 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"
+};
+const Icon = ({ n, s = 16, w = 1.75, className = "", style }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0, ...style }} aria-hidden="true"><path d={ICONS[n]} /></svg>
+);
+
+function VisitAudioPlayer({ audioId }) {
+  const [src, setSrc] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    if (audioId) {
+      if (audioId.startsWith("data:") || audioId.startsWith("blob:")) {
+        setSrc(audioId);
+      } else {
+        getAudioFromDB(audioId).then(url => { if (alive && url) setSrc(url); });
+      }
+    }
+    return () => { alive = false; };
+  }, [audioId]);
+
+  if (!src) return null;
+  return (
+    <div className="mt-2 well p-2.5">
+      <p className="text-[11px] font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+        <Icon n="mic" s={13} /> Doctor Voice Memo for this Sitting:
+      </p>
+      <audio controls src={src} className="w-full h-8" preload="metadata"></audio>
+    </div>
+  );
+}
+
 const INITIAL_APPOINTMENTS = [
   { id: "apt-1", name: "Sajitha", phone: "9876543210", age: 34, gender: "Female", date: "2026-10-07", time: "11:30 AM", doctor: "Dr. Rabia", complaint: "Wisdom tooth pericoronitis", status: "Confirmed" },
-  { id: "apt-2", name: "Najuma Beevi", phone: "9363403175", age: 51, gender: "Female", date: "2026-10-07", time: "04:30 PM", doctor: "Dr. Rabia", complaint: "Crown replacement & scaling", status: "Scheduled" }
+  { id: "apt-2", name: "Najuma Beevi", phone: "9363403175", age: 51, gender: "Female", date: "2026-10-07", time: "04:30 PM", doctor: "Dr. Rabia", complaint: "Crown replacement & scaling", status: "Scheduled" },
+  { id: "apt-3", name: "Deepak S", phone: "9840112233", age: 29, gender: "Male", date: "2026-10-08", time: "10:00 AM", doctor: "Dr. Rabia", complaint: "Routine clinical evaluation", status: "Scheduled" }
 ];
 
 const INITIAL_PATIENTS = [
@@ -320,7 +503,11 @@ const INITIAL_PATIENTS = [
   { id: "p1", name: "Suresh Kumar", phone: "9876543210", age: 38, gender: "Male", chartNo: "20261005_202143", medicalHistory: "Mild Hypertension", allergies: ["Penicillin"], conditions: ["Hypertension"],
     complaint: "Severe pain in lower right molar (#46)", status: "Completed",
     dentalChart: { "46": { status: "RCT", notes: "Canal extirpation done" } },
-    visits: [{ date: "04 Oct 2026", department: "Conservative Dentistry & Endodontics", procedure: "Single-Sitting Root Canal Treatment (RCT)", tooth: "46", notes: "Biomechanical prep and obturation done.", medicines: [seedMed("Ketorol-DT")] }] }
+    visits: [{ date: "04 Oct 2026", department: "Conservative Dentistry & Endodontics", procedure: "Single-Sitting Root Canal Treatment (RCT)", tooth: "46", notes: "Biomechanical prep and obturation done.", medicines: [seedMed("Ketorol-DT")] }] },
+  { id: "p2", name: "Anita Raman", phone: "9363403175", age: 44, gender: "Female", chartNo: "20261005_193010", medicalHistory: "Type 2 Diabetic", allergies: [], conditions: ["Type 2 Diabetic"],
+    complaint: "Calculus buildup, bleeding gums", status: "Completed",
+    dentalChart: { "16": { status: "Caries", notes: "Carious cavity" } },
+    visits: [{ date: "15 Apr 2026", department: "Periodontics", procedure: "Full Mouth Ultrasonic Scaling & Polishing", tooth: "Full Mouth", notes: "Deep supragingival calculus removed.", medicines: [seedMed("Hexidine 0.2%")] }] }
 ];
 
 const INITIAL_REMINDERS = [
@@ -335,49 +522,59 @@ const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSO
 function Odontogram({ selected = [], onToggle, chart = {} }) {
   const tooth = (num) => {
     const s = String(num), st = chart[s]?.status, on = selected.includes(s);
-    let c = "bg-white text-slate-700 border-slate-300";
-    if (st === "RCT") c = "bg-amber-100 text-amber-900 border-amber-400 font-bold";
-    if (st === "Caries") c = "bg-rose-100 text-rose-900 border-rose-400 font-bold";
-    if (st === "Extracted") c = "bg-slate-200 text-slate-400 border-dashed border-slate-400 line-through";
-    if (on) c = "bg-teal-600 text-white border-teal-700 shadow font-bold";
+    let c = "";
+    if (st === "RCT") c = "rct";
+    else if (st === "Caries") c = "car";
+    else if (st === "Extracted") c = "ext";
+    else if (st) c = "trt";
+    if (on) c = "on";
     return <button key={num} type="button" onClick={() => onToggle && onToggle(s)} title={`Tooth #${num}${st ? " (" + st + ")" : ""}`}
-      className={`w-8 h-11 sm:w-9 sm:h-12 text-[11px] rounded border transition ${c}`}>{num}</button>;
+      className={`tooth ${c}`}>{num}</button>;
   };
   const row = (a, b, cls = "") => (
     <div className={`flex justify-center items-center gap-1 overflow-x-auto no-scrollbar ${cls}`}>
-      <div className="flex gap-1">{a.map(tooth)}</div><div className="w-px h-8 bg-slate-300 mx-1"></div><div className="flex gap-1">{b.map(tooth)}</div>
+      <div className="flex gap-1">{a.map(tooth)}</div><div className="w-px h-9 bg-slate-300 mx-1.5"></div><div className="flex gap-1">{b.map(tooth)}</div>
     </div>);
   return (
-    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-      <p className="text-xs font-bold text-slate-600 mb-2">Odontogram — tap teeth to select</p>
-      {row(TEETH.ur, TEETH.ul, "pb-2 border-b border-dashed border-slate-300")}
-      {row(TEETH.lr, TEETH.ll, "pt-2")}
+    <div className="well p-3.5">
+      <div className="flex flex-wrap justify-between items-center gap-2 mb-2.5">
+        <p className="text-xs font-semibold text-slate-700">Odontogram — tap teeth to select</p>
+        <p className="text-[11px] text-slate-500 flex flex-wrap gap-x-3">
+          <span><i className="sw" style={{ background: "#fdf1d6", borderColor: "#e0a93a" }}></i>RCT</span>
+          <span><i className="sw" style={{ background: "#fbe0dd", borderColor: "#e0766b" }}></i>Caries</span>
+          <span><i className="sw" style={{ background: "#e8ecf2", borderStyle: "dashed" }}></i>Extracted</span>
+          <span><i className="sw" style={{ background: "#0f766e", borderColor: "#0b5e58" }}></i>Selected</span>
+        </p>
+      </div>
+      {row(TEETH.ur, TEETH.ul, "pb-2.5 border-b border-dashed border-slate-300")}
+      {row(TEETH.lr, TEETH.ll, "pt-2.5")}
     </div>);
 }
 
 const Field = ({ label, ...p }) => (
-  <div><label className="text-xs font-semibold text-slate-600">{label}</label>
-    <input {...p} className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none" /></div>);
+  <div><label className="lbl">{label}</label>
+    <input {...p} className="inp" /></div>);
+
+const chip = (on) => `chip${on ? " on" : ""}`;
 
 function App() {
   const [user, setUser] = useState(() => { try { return JSON.parse(sessionStorage.getItem("rabia_auth_user")); } catch (e) { return null; } });
   const [login, setLogin] = useState({ username: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState(4); // Default to Doctor Operatory tab
-  const [patients, setPatients] = useState(() => load("rabia_patients_v10", INITIAL_PATIENTS));
-  const [appts, setAppts] = useState(() => load("rabia_appts_v10", INITIAL_APPOINTMENTS));
-  const [reminders, setReminders] = useState(() => load("rabia_reminders_v10", INITIAL_REMINDERS));
+  const [tab, setTab] = useState(1);
+  const [patients, setPatients] = useState(() => load("rabia_patients_v11", INITIAL_PATIENTS));
+  const [appts, setAppts] = useState(() => load("rabia_appts_v11", INITIAL_APPOINTMENTS));
+  const [reminders, setReminders] = useState(() => load("rabia_reminders_v11", INITIAL_REMINDERS));
   const [toast, setToast] = useState(null);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(null);
   const [printModalPt, setPrintModalPt] = useState(null);
 
-  // Taxonomy Custom Categories & Procedures
-  const [categories, setCategories] = useState(() => load("rabia_custom_cats_v10", DEFAULT_CATS));
+  const [categories, setCategories] = useState(() => load("rabia_custom_cats_v11", DEFAULT_CATS));
 
   const blankPt = { name: "", phone: "", age: "", gender: "Female", chartNo: "", complaint: "", allergies: "" };
   const [newPt, setNewPt] = useState(blankPt);
-  const blankApt = { name: "", phone: "", date: "2026-10-07", time: "11:30 AM", doctor: "Dr. Rabia", complaint: "" };
+  const blankApt = { name: "", phone: "", age: "", gender: "Female", date: "2026-10-07", time: "11:30 AM", doctor: "Dr. Rabia", complaint: "" };
   const [newApt, setNewApt] = useState(blankApt);
 
   const [op, setOp] = useState({
@@ -390,21 +587,22 @@ function App() {
 
   const [meds, setMeds] = useState([]);
   const [rec, setRec] = useState(false);
-  const [audio, setAudio] = useState(null);
+  const [audioKey, setAudioKey] = useState(null);
+  const [audioPreview, setAudioPreview] = useState(null);
   const mrRef = useRef(null), chunks = useRef([]);
-  const [custom, setCustom] = useState(() => load("rabia_custom_drugs_v10", []));
+  const [custom, setCustom] = useState(() => load("rabia_custom_drugs_v11", []));
   const [dq, setDq] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [cd, setCd] = useState({ brandName: "", genericSalt: "", timing: "After Food" });
   const [showCatDrawer, setShowCatDrawer] = useState(false);
 
-  // Persist State
-  const persist = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  useEffect(() => persist("rabia_patients_v10", patients), [patients]);
-  useEffect(() => persist("rabia_appts_v10", appts), [appts]);
-  useEffect(() => persist("rabia_custom_drugs_v10", custom), [custom]);
-  useEffect(() => persist("rabia_reminders_v10", reminders), [reminders]);
-  useEffect(() => persist("rabia_custom_cats_v10", categories), [categories]);
+  // Persist Data Safely
+  const persist = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { setToast({ msg: "Local storage limit reached. Old logs preserved." }); } };
+  useEffect(() => persist("rabia_patients_v11", patients), [patients]);
+  useEffect(() => persist("rabia_appts_v11", appts), [appts]);
+  useEffect(() => persist("rabia_custom_drugs_v11", custom), [custom]);
+  useEffect(() => persist("rabia_reminders_v11", reminders), [reminders]);
+  useEffect(() => persist("rabia_custom_cats_v11", categories), [categories]);
 
   const say = (msg) => { setToast({ msg }); setTimeout(() => setToast(null), 3000); };
 
@@ -421,7 +619,7 @@ function App() {
   const allDrugs = [...ALL_DRUGS, ...custom];
   const inRx = (b) => meds.some(m => m.brandName === b);
   const tapDrug = (d) => {
-    if (inRx(d.brandName)) return say(`${d.brandName} is already added`);
+    if (inRx(d.brandName)) return say(`${d.brandName} is already in the list`);
     setMeds(p => [...p, newMed(d)]);
   };
 
@@ -429,16 +627,16 @@ function App() {
   const dropMed = (id) => setMeds(p => p.filter(m => m.id !== id));
   const toggleTooth = (t) => setOp(p => ({ ...p, teeth: p.teeth.includes(t) ? p.teeth.filter(x => x !== t) : [...p.teeth, t] }));
 
-  // Dynamic Category & Procedure Addition
+  // Custom Categories & Procedures
   const handleAddNewCategory = () => {
     const newCat = prompt("Enter new Dental Specialty Category name:");
     if (!newCat || !newCat.trim()) return;
     const catName = newCat.trim();
     if (categories[catName]) return say("Category already exists");
-    
+
     const initialProc = prompt(`Enter first procedure for "${catName}":`);
     const procName = (initialProc && initialProc.trim()) ? initialProc.trim() : "General Consultation";
-    
+
     const updated = { ...categories, [catName]: [procName] };
     setCategories(updated);
     setOp(prev => ({ ...prev, department: catName, procedure: procName }));
@@ -458,27 +656,34 @@ function App() {
     say(`Added procedure: ${procName}`);
   };
 
-  // Voice recording
+  // Robust Voice Recorder (Stores Blob into IndexedDB)
   const startRec = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mr = new MediaRecorder(stream); mrRef.current = mr; chunks.current = [];
       mr.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
-      mr.onstop = () => {
+      mr.onstop = async () => {
         stream.getTracks().forEach(t => t.stop());
-        const r = new FileReader();
-        r.onloadend = () => { setAudio(r.result); say("Voice memo attached"); };
-        r.readAsDataURL(new Blob(chunks.current, { type: mr.mimeType || "audio/webm" }));
+        const blob = new Blob(chunks.current, { type: mr.mimeType || "audio/webm" });
+        const memoId = "memo_" + Date.now();
+        await saveAudioToDB(memoId, blob);
+        setAudioKey(memoId);
+        setAudioPreview(URL.createObjectURL(blob));
+        say("Voice memo recorded for this sitting!");
       };
       mr.start(); setRec(true);
     } catch (e) { alert("Microphone permission required for voice notes."); }
   };
   const stopRec = () => { if (mrRef.current && rec) { mrRef.current.stop(); setRec(false); } };
 
+  // Save Treatment Handler
   const saveTreatment = (e) => {
     e.preventDefault();
-    const pt = patients.find(p => p.id === op.patientId) || patients[0];
+    const pt = patients.find(p => p.id === op.patientId);
+    if (!pt) return say("Select a patient");
     if (!op.teeth.length) return say("Tap at least one tooth on the odontogram");
+    if (meds.some(m => !m.genericSalt)) return say("Every medicine needs a composition for the printed slip");
+
     const tooth = op.teeth.join(", ");
     const visit = {
       date: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
@@ -486,19 +691,43 @@ function App() {
       procedure: op.procedure,
       tooth,
       notes: op.notes || "Procedure completed successfully.",
-      medicines: meds,
-      voiceMemo: audio
+      medicines: [...meds],
+      voiceMemo: audioKey
     };
+
     const chart = { ...(pt.dentalChart || {}) };
     op.teeth.forEach(t => {
-      chart[t] = { status: /RCT/.test(op.procedure) ? "RCT" : /Extraction|Odontectomy/.test(op.procedure) ? "Extracted" : "Treated", notes: op.procedure };
+      chart[t] = {
+        status: /Implant/.test(op.procedure) ? "Implant" : /RCT/.test(op.procedure) ? "RCT" : /Extraction|Odontectomy/.test(op.procedure) ? "Extracted" : "Treated",
+        notes: op.procedure
+      };
     });
-    const updatedPt = { ...pt, status: "Ready for Rx Print", dentalChart: chart, visits: [visit, ...(pt.visits || [])] };
+
+    const updatedPt = {
+      ...pt,
+      status: "Ready for Rx Print",
+      dentalChart: chart,
+      visits: [visit, ...(pt.visits || [])]
+    };
+
     setPatients(patients.map(p => p.id === pt.id ? updatedPt : p));
+    setReminders([{
+      id: "rem_" + Date.now(),
+      patientName: pt.name,
+      phone: pt.phone,
+      type: "Post-Op Follow-up (Auto)",
+      timing: "Scheduled +6h",
+      status: "Pending",
+      message: `Dr. Rabia's Dental Care: Hello ${pt.name}, Dr. Rabia hopes you are recovering well from your ${op.procedure} (Tooth #${tooth}). Please follow the care instructions given.`
+    }, ...reminders]);
+
+    setMeds([]);
+    setAudioKey(null);
+    setAudioPreview(null);
+    setOp(p => ({ ...p, notes: "", teeth: [] }));
     setPrintModalPt(updatedPt);
-    setMeds([]); setAudio(null); setOp(p => ({ ...p, notes: "", teeth: [] }));
-    setTab(3);
-    say("Saved & sent to Reception for printing!");
+    setTab(3); // Switch to Patients & EHR tab
+    say("Saved & transferred to reception print queue!");
   };
 
   const addPatient = (e) => {
@@ -536,8 +765,8 @@ function App() {
       id: "p_" + Date.now(),
       name: a.name,
       phone: a.phone,
-      age: 30,
-      gender: "Female",
+      age: Number(a.age) || 25,
+      gender: a.gender || "Female",
       chartNo: "20261007_" + Math.floor(100000 + Math.random() * 900000),
       medicalHistory: "None reported",
       allergies: [],
@@ -565,738 +794,655 @@ function App() {
     `*Dr. Rabia's Dental Care, Tindivanam*\n\nHello ${name},\nஉங்கள் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை — ${procedure} (Tooth #${tooth}):\n\n${tamilFor(dept)}\n\nஅவசர உதவி / Emergency: ${PHONE}`;
 
   const term = dq.trim().toLowerCase();
-  const searchResults = term.length < 2 ? [] : allDrugs.filter(d => (d.brandName + " " + d.genericSalt).toLowerCase().includes(term)).slice(0, 16);
-
-  if (!user) return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-      <form onSubmit={doLogin} className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 space-y-4">
-        <div className="text-center">
-          <div className="inline-flex w-14 h-14 bg-teal-600 text-white rounded-2xl items-center justify-center text-2xl mb-2 font-bold shadow-md">🦷</div>
-          <h1 className="text-xl font-bold">Dr. Rabia's Dental Care</h1>
-          <p className="text-xs text-slate-500">Authorized staff only · confidential patient data</p>
-        </div>
-        {loginError && <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">{loginError}</div>}
-        <Field label="Staff User ID" required value={login.username} onChange={e => setLogin({ ...login, username: e.target.value })} />
-        <Field label="Password" type="password" required value={login.password} onChange={e => setLogin({ ...login, password: e.target.value })} />
-        <button className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition">Unlock clinic portal</button>
-      </form>
-    </div>
+  const results = term.length < 2 ? [] : allDrugs.filter(d => (d.brandName + " " + d.genericSalt).toLowerCase().includes(term))
+    .sort((x, y) => (y.brandName.toLowerCase().startsWith(term) ? 1 : 0) - (x.brandName.toLowerCase().startsWith(term) ? 1 : 0)).slice(0, 24);
+  const groupsView = custom.length ? { ...DRUG_GROUPS, [CUSTOM_GROUP]: [] } : DRUG_GROUPS;
+  const drugBtn = (d, big) => (
+    <button type="button" key={d.brandName} onClick={() => tapDrug(d)} className={`chip text-left ${inRx(d.brandName) ? "on" : ""}`} style={{ minHeight: 40 }}>
+      <span className="inline-flex items-center gap-1.5">
+        <Icon n={inRx(d.brandName) ? "check" : "plus"} s={12} w={2.2} />{d.brandName}
+      </span>
+      {big && <span className="block text-[10.5px] font-normal opacity-80 mt-0.5" style={{ whiteSpace: "normal", lineHeight: 1.3 }}>{d.genericSalt}</span>}
+    </button>
   );
 
   const fp = patients.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.phone.includes(q) || (p.chartNo || "").includes(q));
   const chairPt = patients.find(p => p.id === op.patientId) || patients[0];
-  const modalPt = printModalPt || chairPt;
+  const modalPt = printModalPt || patients[0];
   const lvModal = modalPt?.visits?.[0];
 
   const alerts = (p) => p && (p.allergies?.length > 0 || p.conditions?.length > 0) && (
-    <div className="bg-rose-50 border-l-4 border-rose-600 p-2.5 rounded-r-lg">
-      <p className="text-[11px] font-bold text-rose-800">⚠️ Clinical risk alert — {p.name}</p>
-      <div className="flex flex-wrap gap-1 mt-1">
-        {p.allergies?.map(a => <span key={a} className="bg-rose-200 text-rose-900 text-[10px] font-bold px-1.5 py-0.5 rounded">Allergy: {a}</span>)}
-        {p.conditions?.map(c => <span key={c} className="bg-amber-200 text-amber-900 text-[10px] font-semibold px-1.5 py-0.5 rounded">{c}</span>)}
+    <div className="rounded-lg p-3" style={{ background: "var(--dangerbg)", border: "1px solid var(--dangerln)", borderLeft: "4px solid var(--danger)" }}>
+      <p className="text-xs font-semibold flex items-center gap-1.5" style={{ color: "var(--danger)" }}><Icon n="alert" s={14} /> Clinical risk alert — {p.name}</p>
+      <div className="flex flex-wrap gap-1.5 mt-1.5">
+        {p.allergies?.map(a => <span key={a} className="badge b-d">Allergy: {a}</span>)}
+        {p.conditions?.map(c => <span key={c} className="badge b-w">{c}</span>)}
       </div>
     </div>
   );
 
   const rxList = (v) => (v && v.medicines) ? v.medicines.map((m, i) => (
-    <p key={i} className="text-[10px] font-mono text-teal-900">• {m.brandName} [ {doseStr(m, " - ")} ] {m.timing} × {m.days}d</p>
+    <p key={i} className="text-[11px] text-slate-700 leading-relaxed">• {m.brandName} [ {doseStr(m, " - ")} ] {m.timing} × {m.days}d</p>
   )) : null;
 
   const TABS = [
-    [1, "Overview", "📊"],
-    [2, "Appointments", "📅", appts.filter(a => a.status === "Confirmed").length],
-    [3, "Patients & EHR", "👥", patients.filter(p => p.status === "Ready for Rx Print").length],
-    [4, "Doctor Operatory (Logs)", "🩺"],
-    [5, "Reminders", "🔔", reminders.filter(r => r.status === "Pending").length],
-    [6, "Google Reviews", "⭐"]
+    [1, "Overview", "overview"],
+    [2, "Appointments", "calendar", appts.filter(a => a.status === "Confirmed").length],
+    [3, "Patients & EHR", "users", patients.filter(p => p.status === "Ready for Rx Print").length],
+    [4, "Doctor Operatory (Logs)", "pulse"],
+    [5, "Reminders", "bell", reminders.filter(r => r.status === "Pending").length],
+    [6, "Google Reviews", "star"]
   ];
+
+  if (!user) return (
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "linear-gradient(160deg,#0c2036 0%,#09182a 60%,#0b2a35 100%)" }}>
+      <form onSubmit={doLogin} className="w-full max-w-md bg-white rounded-xl p-8 space-y-4" style={{ boxShadow: "0 24px 60px rgba(0,0,0,.4)" }}>
+        <div className="flex items-center gap-3 pb-2">
+          <div className="w-11 h-11 rounded-lg flex items-center justify-center text-white" style={{ background: "var(--acc)" }}><Icon n="shield" s={22} w={1.6} /></div>
+          <div>
+            <h1 className="text-lg font-bold leading-tight">Dr. Rabia's Dental Care</h1>
+            <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><Icon n="lock" s={12} /> Authorized staff only · confidential patient data</p>
+          </div>
+        </div>
+        {loginError && <div className="p-3 text-xs rounded-lg flex items-center gap-2" style={{ background: "var(--dangerbg)", border: "1px solid var(--dangerln)", color: "var(--danger)" }}><Icon n="alert" s={14} />{loginError}</div>}
+        <Field label="Staff User ID" required value={login.username} onChange={e => setLogin({ ...login, username: e.target.value })} />
+        <Field label="Password" type="password" required value={login.password} onChange={e => setLogin({ ...login, password: e.target.value })} />
+        <button className="btn btn-p btn-lg w-full">Unlock clinic portal</button>
+        <p className="text-[11px] text-slate-400 text-center pt-1">Powered by <strong>Nexus Digital Hub</strong> ({PHONE})</p>
+      </form>
+    </div>
+  );
+
+  const pageTitle = (TABS.find(t => t[0] === tab) || TABS[0])[1];
+  const NavInner = ({ t }) => (<><Icon n={t[2]} s={17} />{t[1]}{t[3] > 0 && <span className="navcount">{t[3]}</span>}</>);
 
   return (
     <div>
-      <div className="app-chrome min-h-screen flex flex-col bg-[#f8fafc] text-slate-800">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-teal-600 text-white p-2 rounded-xl text-lg font-bold">🦷</div>
-              <div>
-                <h1 className="font-bold text-lg leading-tight text-slate-900">Dr. Rabia's Dental Care</h1>
-                <p className="text-xs text-slate-500 font-medium">Tindivanam Clinic Portal & EzDent Bridge</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <p className="text-xs font-bold text-slate-900">{user.name}</p>
-                <p className="text-[10px] text-teal-700 font-semibold">{user.role}</p>
-              </div>
-              <button onClick={logout} className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-1.5 rounded-lg border border-rose-200 transition">Sign out</button>
+      <div className="app-chrome">
+        {/* Sidebar (desktop) */}
+        <aside className="sidebar">
+          <div className="px-5 pt-6 pb-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(255,255,255,.08)" }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white" style={{ background: "var(--acc)" }}><Icon n="shield" s={21} w={1.6} /></div>
+            <div>
+              <p className="text-white font-semibold text-[14px] leading-tight">Dr. Rabia's Dental Care</p>
+              <p className="text-[11px] mt-0.5" style={{ color: "#8da3bd" }}>Tindivanam Clinic Portal & EzDent Bridge</p>
             </div>
           </div>
-          <div className="max-w-6xl mx-auto px-4 flex gap-1 sm:gap-4 overflow-x-auto text-sm font-semibold border-t border-slate-100 no-scrollbar">
-            {TABS.map(([id, label, ic, badge]) => (
-              <button key={id} onClick={() => setTab(id)} className={`py-3 px-3 border-b-2 flex items-center gap-2 whitespace-nowrap transition ${tab === id ? "border-teal-600 text-teal-700 bg-teal-50/50" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
-                <span>{ic}</span>{label}{badge > 0 && <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{badge}</span>}
-              </button>
+          <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+            {TABS.map(t => (
+              <button key={t[0]} onClick={() => setTab(t[0])} className={`navbtn ${tab === t[0] ? "on" : ""}`}><NavInner t={t} /></button>
             ))}
+          </nav>
+          <div className="p-4 border-t" style={{ borderColor: "rgba(255,255,255,.08)" }}>
+            <p className="text-white text-[13px] font-semibold">{user.name}</p>
+            <p className="text-[11.5px] mb-3" style={{ color: "#5fd3c6" }}>{user.role}</p>
+            <button onClick={logout} className="btn w-full" style={{ background: "rgba(255,255,255,.08)", color: "#e3ecf6", borderColor: "rgba(255,255,255,.12)" }}><Icon n="logout" s={14} /> Sign out</button>
           </div>
-        </header>
+        </aside>
 
-        {toast && <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg text-sm">✓ {toast.msg}</div>}
-
-        <main className="max-w-5xl mx-auto w-full p-4 sm:p-6 flex-1">
-
-          {/* TAB 1: OVERVIEW */}
-          {tab === 1 && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  ["Total patients", patients.length, "text-slate-900"],
-                  ["Appointments", appts.length, "text-teal-700"],
-                  ["Ready to print", patients.filter(p => p.status === "Ready for Rx Print").length, "text-amber-600"],
-                  ["Google rating", "4.9 ★", "text-slate-900"]
-                ].map(([l, v, c]) => (
-                  <div key={l} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-xs text-slate-500 font-semibold uppercase">{l}</p>
-                    <p className={`text-2xl font-bold mt-1 ${c}`}>{v}</p>
-                  </div>
-                ))}
+        <div className="main">
+          <header className="topbar">
+            <div className="px-4 sm:px-8 h-14 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="mnav w-8 h-8 rounded-md items-center justify-center text-white" style={{ background: "var(--acc)" }}><Icon n="shield" s={17} w={1.6} /></div>
+                <h2 className="text-[15px] font-semibold">{pageTitle}</h2>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-                <h3 className="text-base font-bold mb-3 flex justify-between items-center">
-                  <span>Recent Treatments</span>
-                  <button onClick={() => setTab(4)} className="text-xs text-teal-700 font-semibold hover:underline">Open operatory →</button>
-                </h3>
-                <div className="divide-y divide-slate-100">
-                  {patients.flatMap(p => (p.visits || []).map(v => ({ v, p }))).slice(0, 4).map(({ v, p }, i) => (
-                    <div key={i} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
+              <div className="flex items-center gap-3">
+                <div className="text-right hidden sm:block">
+                  <p className="text-xs font-semibold leading-tight">{user.name}</p>
+                  <p className="text-[11px]" style={{ color: "var(--acc)" }}>{user.role}</p>
+                </div>
+                <button onClick={logout} className="btn btn-o lg:hidden"><Icon n="logout" s={14} /> Sign out</button>
+              </div>
+            </div>
+            <div className="mnav px-2 overflow-x-auto no-scrollbar border-t" style={{ borderColor: "var(--line)" }}>
+              {TABS.map(t => (
+                <button key={t[0]} onClick={() => setTab(t[0])} className={`mtab ${tab === t[0] ? "on" : ""}`}>
+                  <Icon n={t[2]} s={15} />{t[1]}{t[3] > 0 && <span className="badge b-w">{t[3]}</span>}
+                </button>
+              ))}
+            </div>
+          </header>
+
+          {toast && <div className="toast"><Icon n="check" s={16} w={2.2} style={{ color: "#5fd3c6" }} />{toast.msg}</div>}
+
+          <main className="w-full p-4 sm:p-8 flex-1" style={{ maxWidth: 1240 }}>
+            {tab === 1 && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                  {[
+                    ["Total patients", patients.length, "users"],
+                    ["Appointments", appts.length, "calendar"],
+                    ["Ready to print", patients.filter(p => p.status === "Ready for Rx Print").length, "printer"],
+                    ["Google rating", <span className="inline-flex items-center gap-1.5">4.9 <Icon n="star" s={18} style={{ color: "#d99a1c", fill: "#f2b53a" }} /></span>, "star"]
+                  ].map(([l, v, ic]) => (
+                    <div key={l} className="card p-4 flex items-start justify-between">
                       <div>
-                        <p className="font-semibold">{p.name} — <span className="text-teal-700">{v.procedure}</span></p>
-                        <p className="text-xs text-slate-500">Tooth #{v.tooth} · Chart {p.chartNo}</p>
-                        {rxList(v)}
+                        <p className="text-xs font-medium text-slate-500">{l}</p>
+                        <p className="text-[26px] font-bold mt-1 leading-none">{v}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => setPrintModalPt(p)} className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold transition">🔍 Preview & Print Rx</button>
-                        <button onClick={() => wa(p.phone, aftercareMsg(p.name, v.procedure, v.tooth, v.department))} className="px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition">WhatsApp</button>
-                      </div>
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "var(--accbg)", color: "var(--acc)" }}><Icon n={ic} s={18} /></div>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: APPOINTMENTS */}
-          {tab === 2 && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden self-start shadow-sm">
-                {appts.map(a => (
-                  <div key={a.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-sm text-slate-900">{a.name}</span>
-                        <span className="text-[10px] bg-teal-50 text-teal-800 font-semibold px-2 py-0.5 rounded border border-teal-200">{a.time}</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{a.date}</span>
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1">📞 {a.phone} · {a.doctor}</p>
-                      <p className="text-xs text-slate-600">Complaint: {a.complaint || "General checkup"}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {a.status !== "Arrived / In Clinic" ? (
-                        <button onClick={() => admit(a)} className="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Admit to queue</button>
-                      ) : (
-                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200">✓ Admitted</span>
-                      )}
-                      <button onClick={() => wa(a.phone, `Hello ${a.name}, your dental appointment with ${a.doctor} at Dr. Rabia's Dental Care Tindivanam is on ${a.date} at ${a.time}. Location: ${MAPS}`)} className="px-3 py-2 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg text-xs font-bold transition">Notify</button>
-                    </div>
+                <div className="card">
+                  <div className="card-h">
+                    <h3 className="card-t">Recent Treatments</h3>
+                    <button onClick={() => setTab(4)} className="btn-link">Open operatory <Icon n="arrow" s={13} /></button>
                   </div>
-                ))}
-              </div>
-              <form onSubmit={addAppt} className="bg-white p-5 rounded-xl border border-slate-200 space-y-3 self-start shadow-sm">
-                <h3 className="font-bold text-sm border-b pb-2">Book New Appointment</h3>
-                <Field label="Patient name" required value={newApt.name} onChange={e => setNewApt({ ...newApt, name: e.target.value })} />
-                <div className="grid grid-cols-2 gap-2">
-                  <Field label="Phone (10 digits)" type="tel" required value={newApt.phone} onChange={e => setNewApt({ ...newApt, phone: e.target.value })} />
-                  <Field label="Time" required value={newApt.time} onChange={e => setNewApt({ ...newApt, time: e.target.value })} />
+                  <div className="divide">
+                    {patients.flatMap(p => (p.visits || []).map(v => ({ v, p }))).slice(0, 4).map(({ v, p }, i) => (
+                      <div key={i} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
+                        <div>
+                          <p className="font-semibold">{p.name} — <span style={{ color: "var(--acc)" }}>{v.procedure}</span></p>
+                          <p className="text-xs text-slate-500 mt-0.5">Tooth #{v.tooth} · Chart {p.chartNo}</p>
+                          <div className="mt-1.5">{rxList(v)}</div>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <button onClick={() => setPrintModalPt(p)} className="btn btn-d"><Icon n="eye" s={14} /> Preview & Print Rx</button>
+                          <button onClick={() => wa(p.phone, aftercareMsg(p.name, v.procedure, v.tooth, v.department))} className="btn btn-wa"><Icon n="message" s={14} /> WhatsApp</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <Field label="Date" type="date" required value={newApt.date} onChange={e => setNewApt({ ...newApt, date: e.target.value })} />
-                <Field label="Chief concern" value={newApt.complaint} onChange={e => setNewApt({ ...newApt, complaint: e.target.value })} />
-                <button className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Confirm booking</button>
-              </form>
-            </div>
-          )}
+              </div>
+            )}
 
-          {/* TAB 3: PATIENTS & EHR */}
-          {tab === 3 && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-4">
-                <input placeholder="Search name, phone or EzDent chart no…" value={q} onChange={e => setQ(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none shadow-sm" />
-                <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden shadow-sm">
-                  {fp.map(pt => (
-                    <div key={pt.id} onClick={() => setSel(pt)} className={`p-4 hover:bg-slate-50 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${sel?.id === pt.id ? "bg-teal-50/70 border-l-4 border-teal-600" : ""}`}>
+            {tab === 2 && (
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2 card divide overflow-hidden self-start">
+                  {appts.map(a => (
+                    <div key={a.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold">{pt.name}</span>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold">{pt.gender}, {pt.age}y</span>
-                          <span className="text-[10px] font-mono bg-teal-50 text-teal-800 border border-teal-200 px-1.5 py-0.5 rounded">{pt.chartNo}</span>
-                          {pt.status === "Ready for Rx Print" && <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full animate-pulse">Ready to print Rx</span>}
+                          <span className="font-semibold text-sm">{a.name}</span>
+                          <span className="badge b-n">{a.gender || "Female"}, {a.age ? `${a.age}y` : "Adult"}</span>
+                          <span className="badge b-a">{a.time}</span>
+                          <span className="badge b-n">{a.date}</span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">📞 {pt.phone} · {pt.medicalHistory}</p>
+                        <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1.5"><Icon n="phone" s={12} /> {a.phone} · {a.doctor}</p>
+                        <p className="text-xs text-slate-600 mt-0.5">Complaint: {a.complaint || "General checkup"}</p>
                       </div>
-                      {pt.visits && pt.visits.length > 0 && (
-                        <button onClick={(e) => { e.stopPropagation(); setPrintModalPt(pt); }} className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shrink-0 shadow-sm transition">🔍 Preview & Print</button>
-                      )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {a.status !== "Arrived / In Clinic" ? (
+                          <button onClick={() => admit(a)} className="btn btn-p">Admit to queue</button>
+                        ) : (
+                          <span className="badge b-o" style={{ padding: "6px 11px" }}><Icon n="check" s={13} w={2.2} /> Admitted</span>
+                        )}
+                        <button onClick={() => wa(a.phone, `Hello ${a.name}, your dental appointment with ${a.doctor} at Dr. Rabia's Dental Care Tindivanam is on ${a.date} at ${a.time}. Please arrive 10 minutes early. Location: ${MAPS}`)} className="btn btn-wa"><Icon n="send" s={13} /> Notify</button>
+                      </div>
                     </div>
                   ))}
                 </div>
+                <form onSubmit={addAppt} className="card self-start">
+                  <div className="card-h"><h3 className="card-t">Book New Appointment</h3></div>
+                  <div className="card-b space-y-3.5">
+                    <Field label="Patient name" required value={newApt.name} onChange={e => setNewApt({ ...newApt, name: e.target.value })} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Phone (10 digits)" type="tel" required value={newApt.phone} onChange={e => setNewApt({ ...newApt, phone: e.target.value })} />
+                      <Field label="Age" type="number" required value={newApt.age} onChange={e => setNewApt({ ...newApt, age: e.target.value })} placeholder="e.g. 28" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Date" type="date" required value={newApt.date} onChange={e => setNewApt({ ...newApt, date: e.target.value })} />
+                      <Field label="Time" required value={newApt.time} onChange={e => setNewApt({ ...newApt, time: e.target.value })} />
+                    </div>
+                    <Field label="Chief concern" value={newApt.complaint} onChange={e => setNewApt({ ...newApt, complaint: e.target.value })} />
+                    <button className="btn btn-p btn-lg w-full">Confirm booking</button>
+                  </div>
+                </form>
               </div>
+            )}
 
-              <div className="self-start">
-                {sel ? (
-                  <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-4 shadow-sm">
-                    <div className="flex justify-between border-b pb-3">
-                      <h3 className="font-bold text-slate-900">EHR Patient Chart</h3>
-                      <button onClick={() => setSel(null)} className="text-xs text-slate-500 hover:text-slate-800">Close ✕</button>
-                    </div>
-                    {alerts(sel)}
-                    <div>
-                      <p className="text-lg font-bold text-slate-900">{sel.name}</p>
-                      <p className="text-xs text-slate-500">{sel.phone} · {sel.age}y · {sel.gender}</p>
-                      <p className="text-xs font-mono text-teal-800">Chart: {sel.chartNo}</p>
-                    </div>
-                    <Odontogram selected={[]} onToggle={() => {}} chart={sel.dentalChart} />
-                    <div className="flex gap-2">
-                      {sel.visits && sel.visits.length > 0 && (
-                        <button onClick={() => setPrintModalPt(sel)} className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition">🔍 Preview & Print</button>
-                      )}
-                      <button onClick={() => { setOp(p => ({ ...p, patientId: sel.id })); setTab(4); }} className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Log Treatment</button>
-                    </div>
-                  </div>
-                ) : (
-                  <form onSubmit={addPatient} className="bg-white p-5 rounded-xl border border-slate-200 space-y-3 shadow-sm">
-                    <h3 className="font-bold text-sm border-b pb-2">Register Walk-in Patient</h3>
-                    <Field label="Full name" required value={newPt.name} onChange={e => setNewPt({ ...newPt, name: e.target.value })} />
-                    <div className="grid grid-cols-2 gap-2">
-                      <Field label="Phone" type="tel" required value={newPt.phone} onChange={e => setNewPt({ ...newPt, phone: e.target.value })} />
-                      <Field label="Age" type="number" required value={newPt.age} onChange={e => setNewPt({ ...newPt, age: e.target.value })} placeholder="23" />
-                    </div>
-                    <Field label="EzDent chart no" value={newPt.chartNo} onChange={e => setNewPt({ ...newPt, chartNo: e.target.value })} />
-                    <button className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Save patient record</button>
-                  </form>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: DOCTOR OPERATORY WITH DYNAMIC ADD CATEGORY & PROCEDURE */}
-          {tab === 4 && (
-            <form onSubmit={saveTreatment} className="space-y-4">
-              
-              {/* Patient in Chair Selection */}
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Patient in Chair</span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <select 
-                      value={op.patientId} 
-                      onChange={e => setOp({ ...op, patientId: e.target.value, teeth: [] })}
-                      className="font-bold text-sm text-slate-900 bg-transparent border-b border-dashed border-teal-500 focus:outline-none"
-                    >
-                      {patients.map(p => <option key={p.id} value={p.id}>{p.name} ({p.gender}, {p.age}y)</option>)}
-                    </select>
-                    <span className="font-mono text-xs bg-teal-50 text-teal-800 px-2 py-0.5 rounded border border-teal-200">
-                      Chart: {chairPt.chartNo}
-                    </span>
-                  </div>
-                </div>
-
-                {printModalPt && (
-                  <button 
-                    type="button" 
-                    onClick={() => setPrintModalPt(chairPt)}
-                    className="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-bold shadow transition"
-                  >
-                    Preview Last Rx Slip
-                  </button>
-                )}
-              </div>
-
-              {/* 32-Tooth Odontogram */}
-              <Odontogram selected={op.teeth} onToggle={toggleTooth} chart={chairPt?.dentalChart} />
-
-              {/* ======================================================== */}
-              {/* 1. TOP CARD: Specialty Category & Clinical Procedure */}
-              {/* ======================================================== */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <label className="block text-xs font-bold text-slate-700">
-                        Specialty Category
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleAddNewCategory}
-                        className="text-[11px] font-bold text-teal-700 hover:text-teal-900 hover:underline"
-                      >
-                        + Add category
-                      </button>
-                    </div>
-                    <div className="relative">
-                      <select
-                        value={op.department}
-                        onChange={e => {
-                          const dept = e.target.value;
-                          setOp({ ...op, department: dept, procedure: (categories[dept] && categories[dept][0]) || "General Consultation" });
-                        }}
-                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm"
-                      >
-                        {Object.keys(categories).map(cat => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <label className="block text-xs font-bold text-slate-700">
-                        Clinical Procedure
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleAddNewProcedure}
-                        className="text-[11px] font-bold text-teal-700 hover:text-teal-900 hover:underline"
-                      >
-                        + Add procedure
-                      </button>
-                    </div>
-                    <div className="relative">
-                      <select
-                        value={op.procedure}
-                        onChange={e => setOp({ ...op, procedure: e.target.value })}
-                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm"
-                      >
-                        {(categories[op.department] || []).map(pr => (
-                          <option key={pr} value={pr}>{pr}</option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* ======================================================== */}
-              {/* 2. MIDDLE CARD: Drug Search & One-Tap Palette (94 Formulations) */}
-              {/* ======================================================== */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                
-                <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Drug Search & One–Tap Palette (94 Formulations)
-                  </h3>
-                  <span className="text-xs font-semibold text-teal-600">
-                    Tap adds formulation
-                  </span>
-                </div>
-
-                {/* Input Search & Add Drug Button */}
-                <div className="flex items-center gap-3">
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      value={dq}
-                      onChange={e => setDq(e.target.value)}
-                      placeholder="Type 2 letters — au, pan, flag, syp..."
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowAdd(true)}
-                    className="px-4 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
-                  >
-                    + Add clinic drug
-                  </button>
-                </div>
-
-                {/* Dynamic Real-time Search Box */}
-                {term.length >= 2 && (
-                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                    <p className="text-[11px] font-bold text-slate-500 mb-1.5">Matching Formulations:</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {searchResults.map(d => (
-                        <button
-                          type="button"
-                          key={d.brandName}
-                          onClick={() => tapDrug(d)}
-                          className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition active:scale-95 ${
-                            inRx(d.brandName) 
-                              ? "bg-teal-600 text-white border-teal-700" 
-                              : "bg-white text-slate-800 border-slate-300 hover:border-teal-500"
-                          }`}
-                        >
-                          {inRx(d.brandName) ? "✓ " : "+ "}{d.brandName}
+            {tab === 3 && (
+              <div className="space-y-5">
+                {patients.some(p => p.status === "Ready for Rx Print") && (
+                  <div className="rounded-lg p-4 space-y-2.5" style={{ background: "var(--warnbg)", border: "1px solid var(--warnln)" }}>
+                    <p className="text-xs font-semibold flex items-center gap-2" style={{ color: "var(--warn)" }}>
+                      <Icon n="printer" s={15} /> Completed by Doctor — Ready for Printing (1-Click):
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {patients.filter(p => p.status === "Ready for Rx Print").map(p => (
+                        <button key={p.id} onClick={() => setPrintModalPt(p)} className="btn btn-d">
+                          <span>Preview & Print: {p.name} (#{p.visits && p.visits[0] ? p.visits[0].tooth : "Rx"})</span>
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Daily Quick-Tap Formulations Pills */}
-                <div>
-                  <p className="text-[11px] font-bold text-slate-600 mb-2">
-                    Daily Quick–Tap Formulations
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {PRESETS.map(b => allDrugs.find(d => d.brandName === b)).filter(Boolean).map(drug => (
-                      <button
-                        key={drug.brandName}
-                        type="button"
-                        onClick={() => tapDrug(drug)}
-                        className={`px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-sm transition-all active:scale-95 ${
-                          inRx(drug.brandName)
-                            ? "bg-teal-600 text-white border-teal-700 shadow"
-                            : "bg-white text-slate-800 border-slate-200 hover:border-teal-500"
-                        }`}
-                      >
-                        {inRx(drug.brandName) ? "✓ " : "+ "}{drug.brandName}
-                      </button>
-                    ))}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                  <div className="xl:col-span-2 space-y-4">
+                    <div className="relative">
+                      <Icon n="search" s={16} className="absolute" style={{ left: 13, top: 13, color: "var(--mute)" }} />
+                      <input placeholder="Search name, phone or EzDent chart no…" value={q} onChange={e => setQ(e.target.value)} className="inp" style={{ marginTop: 0, paddingLeft: 38, height: 42 }} />
+                    </div>
+                    <div className="card divide overflow-hidden">
+                      {fp.map(pt => (
+                        <div key={pt.id} onClick={() => setSel(pt)} className="rowh px-5 py-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={sel?.id === pt.id ? { background: "var(--accbg)", boxShadow: "inset 3px 0 0 var(--acc)" } : {}}>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold">{pt.name}</span>
+                              <span className="badge b-n">{pt.gender}, {pt.age ? `${pt.age}y` : "Adult"}</span>
+                              <span className="badge b-a">{pt.chartNo}</span>
+                              {pt.status === "Ready for Rx Print" && <span className="badge b-w"><i className="dot"></i> Ready to print Rx</span>}
+                            </div>
+                            <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1.5"><Icon n="phone" s={12} /> {pt.phone} · {pt.medicalHistory}</p>
+                            <div className="flex flex-wrap gap-1.5 mt-1.5">
+                              {pt.allergies?.map(a => <span key={a} className="badge b-d"><Icon n="alert" s={11} /> {a}</span>)}
+                              {pt.conditions?.map(c => <span key={c} className="badge b-w">{c}</span>)}
+                            </div>
+                          </div>
+                          {pt.visits && pt.visits.length > 0 && (
+                            <button onClick={(e) => { e.stopPropagation(); setPrintModalPt(pt); }} className="btn btn-d shrink-0"><Icon n="eye" s={14} /> Preview & Print</button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                {/* Expandable Category Drawer */}
-                <div className="border border-slate-200 rounded-xl p-3 bg-white">
-                  <button
-                    type="button"
-                    onClick={() => setShowCatDrawer(!showCatDrawer)}
-                    className="w-full flex justify-between items-center text-xs font-bold text-slate-800 focus:outline-none"
-                  >
-                    <span>Browse all 75+ drugs by category</span>
-                    <svg className={`w-4 h-4 text-slate-500 transition-transform ${showCatDrawer ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                  </button>
-
-                  {showCatDrawer && (
-                    <div className="space-y-3 mt-3 pt-3 border-t border-slate-100 max-h-60 overflow-y-auto">
-                      {Object.keys(DRUG_GROUPS).map(group => (
-                        <div key={group}>
-                          <p className="text-[11px] font-bold text-slate-600 mb-1">{group}</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {allDrugs.filter(d => d.group === group).map(d => (
-                              <button
-                                type="button"
-                                key={d.brandName}
-                                onClick={() => tapDrug(d)}
-                                className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition ${
-                                  inRx(d.brandName) ? "bg-teal-600 text-white border-teal-700" : "bg-white text-slate-700 border-slate-200 hover:border-teal-500"
-                                }`}
-                              >
-                                {inRx(d.brandName) ? "✓ " : "+ "}{d.brandName}
-                              </button>
+                  <div className="self-start">
+                    {sel ? (
+                      <div className="card">
+                        <div className="card-h">
+                          <h3 className="card-t">EHR Patient Chart</h3>
+                          <button onClick={() => setSel(null)} className="btn-link" style={{ color: "var(--ink2)" }}>Close <Icon n="x" s={13} /></button>
+                        </div>
+                        <div className="card-b space-y-4">
+                          {alerts(sel)}
+                          <div>
+                            <p className="text-lg font-bold">{sel.name}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{sel.phone} · {sel.age ? `${sel.age}y` : "Adult"} · {sel.gender}</p>
+                            <p className="text-xs font-semibold mt-0.5" style={{ color: "var(--acc2)" }}>Chart: {sel.chartNo}</p>
+                            <p className="text-xs mt-2">Complaint: <strong>{sel.complaint}</strong></p>
+                          </div>
+                          <Odontogram selected={[]} onToggle={() => {}} chart={sel.dentalChart} />
+                          <div className="space-y-3 max-h-72 overflow-y-auto">
+                            {(!sel.visits || sel.visits.length === 0) ? (
+                              <p className="text-xs text-slate-400 italic">No visits recorded.</p>
+                            ) : sel.visits.map((v, i) => (
+                              <div key={i} className="text-xs well p-3 space-y-1.5">
+                                <div className="flex justify-between gap-2 font-semibold">
+                                  <span>{v.procedure} (#{v.tooth})</span>
+                                  <span className="text-slate-400 font-medium whitespace-nowrap">{v.date}</span>
+                                </div>
+                                <p className="text-slate-600">{v.notes}</p>
+                                <div className="bg-white p-2.5 rounded-md border" style={{ borderColor: "var(--line)" }}>
+                                  <p className="text-[11px] font-semibold text-slate-700 mb-1">Pharmacy pick-list (staff only):</p>
+                                  {rxList(v)}
+                                </div>
+                                {v.voiceMemo && <VisitAudioPlayer audioId={v.voiceMemo} />}
+                              </div>
                             ))}
                           </div>
+                          <div className="flex gap-2">
+                            {sel.visits && sel.visits.length > 0 && (
+                              <button onClick={() => setPrintModalPt(sel)} className="btn btn-d flex-1" style={{ minHeight: 40 }}><Icon n="eye" s={14} /> Preview & Print</button>
+                            )}
+                            <button onClick={() => { setOp(p => ({ ...p, patientId: sel.id })); setTab(4); }} className="btn btn-p flex-1" style={{ minHeight: 40 }}>Log treatment</button>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    ) : (
+                      <form onSubmit={addPatient} className="card">
+                        <div className="card-h"><h3 className="card-t">Register Walk-in Patient</h3></div>
+                        <div className="card-b space-y-3.5">
+                          <Field label="Full name" required value={newPt.name} onChange={e => setNewPt({ ...newPt, name: e.target.value })} />
+                          <div className="grid grid-cols-2 gap-3">
+                            <Field label="Phone" type="tel" required value={newPt.phone} onChange={e => setNewPt({ ...newPt, phone: e.target.value })} />
+                            <Field label="Age" type="number" required value={newPt.age} onChange={e => setNewPt({ ...newPt, age: e.target.value })} placeholder="e.g. 23" />
+                          </div>
+                          <Field label="EzDent chart no" value={newPt.chartNo} onChange={e => setNewPt({ ...newPt, chartNo: e.target.value })} />
+                          <Field label="Allergies (comma separated)" value={newPt.allergies} onChange={e => setNewPt({ ...newPt, allergies: e.target.value })} />
+                          <Field label="Chief complaint" value={newPt.complaint} onChange={e => setNewPt({ ...newPt, complaint: e.target.value })} />
+                          <button className="btn btn-p btn-lg w-full">Save patient record</button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
                 </div>
+              </div>
+            )}
 
-                {/* Modal: Custom Drug */}
-                {showAdd && (
-                  <div className="fixed inset-0 z-40 bg-black/50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl p-5 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto shadow-2xl">
-                      <h4 className="font-bold text-sm">Add Clinic Drug to Stock</h4>
-                      <Field label="Brand name" value={cd.brandName} onChange={e => setCd({ ...cd, brandName: e.target.value })} />
-                      <Field label="Generic composition (printed on slip)" value={cd.genericSalt} onChange={e => setCd({ ...cd, genericSalt: e.target.value })} placeholder="e.g. Tab. Paracetamol 500 mg" />
-                      <div>
-                        <p className="text-xs font-semibold text-slate-600 mb-1">Default timing</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {TIMINGS.map(t => <button type="button" key={t} onClick={() => setCd({ ...cd, timing: t })} className={`min-h-[38px] px-3 rounded-lg border text-xs font-semibold ${cd.timing === t ? "bg-teal-600 text-white" : "bg-white"}`}>{t}</button>)}
-                        </div>
+            {/* TAB 4: DOCTOR OPERATORY */}
+            {tab === 4 && (
+              <form onSubmit={saveTreatment} className="max-w-4xl card">
+                <div className="card-h" style={{ alignItems: "flex-start" }}>
+                  <div>
+                    <h3 className="card-t">Doctor Operatory — Chairside, Tap Only</h3>
+                    <p className="sub mt-1">Commercial trade names show here for clinic pharmacy. The printed slip generates legal active formulations only.</p>
+                  </div>
+                </div>
+                <div className="card-b space-y-6">
+                  <div>
+                    <label className="lbl">Patient in chair</label>
+                    <select value={op.patientId} onChange={e => setOp({ ...op, patientId: e.target.value, teeth: [] })} className="inp font-semibold">
+                      {patients.map(p => <option key={p.id} value={p.id}>{p.name} — {p.chartNo}</option>)}
+                    </select>
+                  </div>
+                  {alerts(chairPt)}
+
+                  <div>
+                    <Odontogram selected={op.teeth} onToggle={toggleTooth} chart={chairPt?.dentalChart} />
+                    <p className="text-xs font-semibold mt-2" style={{ color: "var(--acc2)" }}>Selected: {op.teeth.length ? "#" + op.teeth.join(", #") : "none yet"}</p>
+                  </div>
+
+                  {/* Specialty & Procedure Selectors */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 well p-4">
+                    <div>
+                      <div className="flex justify-between items-center">
+                        <label className="lbl">Specialty Category</label>
+                        <button type="button" onClick={handleAddNewCategory} className="btn-link"><Icon n="plus" s={12} w={2.2} /> Add category</button>
                       </div>
-                      <div className="flex gap-2 pt-2">
-                        <button type="button" onClick={() => {
-                          const b = cd.brandName.trim(), g = cd.genericSalt.trim();
-                          if (!b || !g) return say("Both brand and generic are required");
-                          setCustom([...custom, { brandName: b, genericSalt: g, m: true, a: false, n: true, timing: cd.timing, days: 3, group: CUSTOM_GROUP }]);
-                          setCd({ brandName: "", genericSalt: "", timing: "After Food" }); setShowAdd(false); say(`${b} saved to stock`);
-                        }} className="flex-1 py-2.5 bg-teal-600 text-white rounded-lg text-xs font-bold">Save to stock</button>
-                        <button type="button" onClick={() => setShowAdd(false)} className="px-4 py-2.5 bg-slate-100 rounded-lg text-xs font-bold">Cancel</button>
+                      <select
+                        value={op.department}
+                        onChange={e => {
+                          const dept = e.target.value;
+                          setOp({ ...op, department: dept, procedure: (categories[dept] && categories[dept][0]) || "General Consultation" });
+                        }}
+                        className="inp font-semibold"
+                      >
+                        {Object.keys(categories).map(d => <option key={d} value={d}>{d}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <div className="flex justify-between items-center">
+                        <label className="lbl">Clinical Procedure</label>
+                        <button type="button" onClick={handleAddNewProcedure} className="btn-link"><Icon n="plus" s={12} w={2.2} /> Add procedure</button>
                       </div>
+                      <select
+                        value={op.procedure}
+                        onChange={e => setOp({ ...op, procedure: e.target.value })}
+                        className="inp font-semibold"
+                      >
+                        {(categories[op.department] || []).map(pr => <option key={pr} value={pr}>{pr}</option>)}
+                      </select>
                     </div>
                   </div>
-                )}
 
-                <div className="border-t border-slate-100 my-2"></div>
-
-                {/* ======================================================== */}
-                {/* 3. BOTTOM SECTION: Prescription (X) */}
-                {/* ======================================================== */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-slate-900">
-                    Prescription ({meds.length})
-                  </h4>
-
-                  {meds.length === 0 ? (
-                    <div className="p-4 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50/50">
-                      <p className="text-xs text-slate-400 italic font-medium">
-                        Nothing prescribed. Tap a drug above.
-                      </p>
+                  {/* Drug Search & One-Tap Palette */}
+                  <div className="well p-4 space-y-4">
+                    <div className="flex justify-between items-center flex-wrap gap-1">
+                      <p className="text-sm font-semibold">Drug Search & One-Tap Palette ({allDrugs.length} Formulations)</p>
+                      <span className="text-xs font-medium" style={{ color: "var(--acc2)" }}>Tap adds formulation</span>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {meds.map((m, idx) => (
-                        <div key={m.id} className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 text-xs">
-                          <div className="flex justify-between items-start">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1 min-w-0">
+                        <Icon n="search" s={15} className="absolute" style={{ left: 11, top: 13, color: "var(--mute)" }} />
+                        <input value={dq} onChange={e => setDq(e.target.value)} placeholder="Type 2 letters — au, pan, flag, syp…" className="inp" style={{ marginTop: 0, paddingLeft: 34, height: 40 }} />
+                      </div>
+                      {dq && <button type="button" onClick={() => setDq("")} className={chip(false)}>Clear</button>}
+                      <button type="button" onClick={() => setShowAdd(true)} className="btn btn-d" style={{ minHeight: 40 }}><Icon n="plus" s={14} w={2.2} /> Add clinic drug</button>
+                    </div>
+                    {term.length >= 2 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {results.length ? results.map(d => drugBtn(d, true)) : <p className="text-xs text-slate-500 col-span-full">No match. Tap "+ Add clinic drug" to save it to your stock.</p>}
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-600 mb-2">Daily Quick-Tap Formulations</p>
+                          <div className="flex flex-wrap gap-2">
+                            {PRESETS.map(b => allDrugs.find(d => d.brandName === b)).filter(Boolean).map(d => drugBtn(d))}
+                          </div>
+                        </div>
+                        <details className="bg-white rounded-lg border p-3" style={{ borderColor: "var(--line)" }}>
+                          <summary className="text-xs font-semibold cursor-pointer min-h-[28px] flex items-center">Browse all 75+ drugs by category</summary>
+                          <div className="space-y-4 mt-3">
+                            {Object.keys(groupsView).map(g => (
+                              <div key={g}>
+                                <p className="text-xs font-semibold text-slate-600 mb-2">{g}</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {allDrugs.filter(d => d.group === g).map(d => drugBtn(d))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      </>
+                    )}
+
+                    {showAdd && (
+                      <div className="overlay z-40">
+                        <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto" style={{ boxShadow: "0 24px 60px rgba(0,0,0,.35)" }}>
+                          <h4 className="font-semibold text-[15px]">Add Clinic Drug to Stock</h4>
+                          <Field label="Brand name" value={cd.brandName} onChange={e => setCd({ ...cd, brandName: e.target.value })} />
+                          <Field label="Generic composition (printed on slip)" value={cd.genericSalt} onChange={e => setCd({ ...cd, genericSalt: e.target.value })} placeholder="e.g. Tab. Paracetamol 500 mg" />
+                          <div>
+                            <p className="lbl mb-1.5">Default timing</p>
+                            <div className="flex flex-wrap gap-2">
+                              {TIMINGS.map(t => <button type="button" key={t} onClick={() => setCd({ ...cd, timing: t })} className={chip(cd.timing === t)}>{t}</button>)}
+                            </div>
+                          </div>
+                          {custom.length > 0 && (
+                            <div className="border-t pt-3" style={{ borderColor: "var(--line)" }}>
+                              <p className="lbl mb-1.5">Your saved stock</p>
+                              {custom.map(c => (
+                                <div key={c.brandName} className="flex justify-between items-center text-xs py-1.5">
+                                  <span className="font-medium">{c.brandName} <span className="text-slate-400 font-normal">— {c.genericSalt}</span></span>
+                                  <button type="button" onClick={() => setCustom(custom.filter(x => x.brandName !== c.brandName))} className="p-1 rounded text-slate-400 hover:text-red-600" aria-label="Remove"><Icon n="x" s={14} /></button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <div className="flex gap-2 pt-1">
+                            <button type="button" onClick={() => {
+                              const b = cd.brandName.trim(), g = cd.genericSalt.trim();
+                              if (!b || !g) return say("Brand and generic composition are both required");
+                              setCustom([...custom, { brandName: b, genericSalt: g, m: true, a: false, n: true, timing: cd.timing, days: 3, group: CUSTOM_GROUP }]);
+                              setCd({ brandName: "", genericSalt: "", timing: "After Food" }); setShowAdd(false); say(`${b} saved to clinic stock`);
+                            }} className="btn btn-p btn-lg flex-1">Save to stock</button>
+                            <button type="button" onClick={() => setShowAdd(false)} className="btn btn-o btn-lg">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Prescriptions Added Counter */}
+                    <div className="border-t pt-4 space-y-3" style={{ borderColor: "var(--line)" }}>
+                      <p className="text-sm font-semibold">Prescription ({meds.length})</p>
+                      {meds.length === 0 && <p className="text-xs text-slate-400 text-center py-4 bg-white rounded-lg border border-dashed" style={{ borderColor: "#cdd6e2" }}>Nothing prescribed. Tap a drug above.</p>}
+                      {meds.map(m => (
+                        <div key={m.id} className="bg-white p-4 rounded-lg border space-y-3" style={{ borderColor: "var(--line)" }}>
+                          <div className="flex justify-between items-start gap-2">
                             <div>
-                              <span className="font-bold text-slate-900 text-xs">{idx + 1}. {m.brandName}</span>
-                              <p className="text-[10px] text-slate-500 italic mt-0.5">{composition(m)}</p>
+                              <p className="font-semibold text-sm">{m.brandName} <span className="font-bold" style={{ color: "var(--acc2)" }}>[ {doseStr(m, " - ")} ]</span></p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">Prints as: {composition(m)}</p>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => dropMed(m.id)}
-                              className="text-slate-400 hover:text-rose-600 px-2 py-1 text-sm font-bold"
-                            >
-                              ✕
-                            </button>
+                            <button type="button" onClick={() => dropMed(m.id)} className="p-2 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50" aria-label="Remove medicine"><Icon n="x" s={16} /></button>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60">
-                            <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[10px] font-bold">
-                              <button
-                                type="button"
-                                onClick={() => setMed(m.id, { m: !m.m })}
-                                className={`px-2 py-0.5 rounded transition ${m.m ? "bg-teal-600 text-white" : "text-slate-400"}`}
-                              >M</button>
-                              <button
-                                type="button"
-                                onClick={() => setMed(m.id, { a: !m.a })}
-                                className={`px-2 py-0.5 rounded transition ${m.a ? "bg-teal-600 text-white" : "text-slate-400"}`}
-                              >A</button>
-                              <button
-                                type="button"
-                                onClick={() => setMed(m.id, { n: !m.n })}
-                                className={`px-2 py-0.5 rounded transition ${m.n ? "bg-teal-600 text-white" : "text-slate-400"}`}
-                              >N</button>
-                            </div>
+                          <div className="flex flex-wrap gap-1.5 items-center well p-2">
+                            <span className="text-[11px] text-slate-500 font-semibold mr-1">Quick:</span>
+                            <button type="button" onClick={() => setMed(m.id, { m: true, a: false, n: true, timing: "After Food" })} className="chip" style={{ minHeight: 28, fontSize: 11 }}>1-0-1 (BD)</button>
+                            <button type="button" onClick={() => setMed(m.id, { m: true, a: true, n: true, timing: "After Food" })} className="chip" style={{ minHeight: 28, fontSize: 11 }}>1-1-1 (TDS)</button>
+                            <button type="button" onClick={() => setMed(m.id, { m: true, a: false, n: false, timing: "Before Food" })} className="chip" style={{ minHeight: 28, fontSize: 11 }}>1-0-0 (OD)</button>
+                            <button type="button" onClick={() => setMed(m.id, { m: false, a: false, n: true, timing: "SOS (Only if Pain)", days: 2 })} className="chip" style={{ minHeight: 28, fontSize: 11, background: "var(--warnbg)", color: "var(--warn)", borderColor: "var(--warnln)" }}>SOS</button>
+                          </div>
 
-                            <span className="font-mono font-bold text-teal-800 text-[11px]">
-                              ({doseStr(m, " - ")})
-                            </span>
-
-                            <select
-                              value={m.timing}
-                              onChange={(e) => setMed(m.id, { timing: e.target.value })}
-                              className="text-[10px] font-medium border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none"
-                            >
-                              {TIMINGS.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-
-                            <div className="flex items-center gap-1 text-[10px]">
-                              <span>For:</span>
-                              <input
-                                type="number"
-                                min="1"
-                                max="30"
-                                value={m.days}
-                                onChange={(e) => setMed(m.id, { days: Number(e.target.value) })}
-                                className="w-10 border border-slate-200 rounded-lg px-1 py-1 text-center font-bold bg-white"
-                              />
-                              <span>days</span>
-                            </div>
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            {[["m", "M"], ["a", "A"], ["n", "N"]].map(([k, l]) => <button type="button" key={k} onClick={() => setMed(m.id, { [k]: !m[k] })} className={chip(m[k]) + " w-11"}>{l}</button>)}
+                            <span className="w-1"></span>
+                            {TIMINGS.map(t => <button type="button" key={t} onClick={() => setMed(m.id, { timing: t })} className={chip(m.timing === t)}>{t}</button>)}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            <button type="button" onClick={() => setMed(m.id, { days: Math.max(1, m.days - 1) })} className={chip(false) + " w-9"}>−</button>
+                            <span className="w-16 text-center text-xs font-semibold">{m.days} day{m.days > 1 ? "s" : ""}</span>
+                            <button type="button" onClick={() => setMed(m.id, { days: Math.min(30, m.days + 1) })} className={chip(false) + " w-9"}>+</button>
+                            <span className="w-1"></span>
+                            {[1, 2, 3, 5, 7, 10, 14].map(n => <button type="button" key={n} onClick={() => setMed(m.id, { days: n })} className={`chip ${m.days === n ? "on" : ""}`} style={{ minHeight: 30, width: 32, padding: 0, fontSize: 11.5 }}>{n}</button>)}
                           </div>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
 
-                {/* Voice Memo Box */}
-                <div className="border-t pt-3 flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">Doctor Voice Audio Memo</p>
-                    <p className="text-[10px] text-slate-500">Record a quick audio message directly for the front desk.</p>
-                  </div>
-                  {!rec ? (
-                    <button type="button" onClick={startRec} className="min-h-[40px] px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                      🎙 Record Memo
-                    </button>
-                  ) : (
-                    <button type="button" onClick={stopRec} className="min-h-[40px] px-4 bg-slate-900 text-white rounded-lg text-xs font-bold animate-pulse transition">
-                      ■ Stop & Attach
-                    </button>
-                  )}
-                </div>
-                {audio && <audio controls src={audio} className="w-full h-10 mt-1"></audio>}
-
-              </div>
-
-              {/* Tamil Booklet Summary */}
-              <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                <h4 className="text-xs font-bold text-amber-900 mb-1 ta">பல் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை (Booklet Summary)</h4>
-                <p className="text-xs text-amber-900 whitespace-pre-line leading-relaxed ta">{tamilFor(op.department)}</p>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-700">Operatory Notes (Optional)</label>
-                <input value={op.notes} onChange={e => setOp({ ...op, notes: e.target.value })} className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="e.g. Canals prepared to 21mm, temporized with Cavit" />
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <button className="flex-1 min-h-[48px] bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold shadow transition">
-                  Complete & Send to Reception
-                </button>
-                <button type="button" onClick={() => chairPt && wa(chairPt.phone, aftercareMsg(chairPt.name, op.procedure, op.teeth.join(", ") || "General", op.department))} className="min-h-[48px] px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow transition">
-                  Send Aftercare on WhatsApp
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* TAB 5: REMINDERS */}
-          {tab === 5 && (
-            <div className="space-y-3">
-              {reminders.map(r => (
-                <div key={r.id} className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${r.status === "Pending" ? "bg-white border-amber-200 shadow-sm" : "bg-slate-50 border-slate-200"}`}>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-slate-900">{r.patientName}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.status === "Pending" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>{r.status}</span>
-                    </div>
-                    <p className="text-xs font-medium text-teal-700">{r.type}</p>
-                    <p className="text-xs text-slate-600 mt-1 max-w-xl">"{r.message}"</p>
-                    <p className="text-[11px] text-slate-400 mt-1">{r.timing} · 📞 {r.phone}</p>
-                  </div>
-                  <div className="flex gap-2 shrink-0">
-                    <button onClick={() => sms(r.phone, r.message, r.id)} className="px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold">SMS</button>
-                    <button onClick={() => wa(r.phone, r.message)} className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold">WhatsApp</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* TAB 6: GOOGLE REVIEWS */}
-          {tab === 6 && (
-            <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl border border-slate-200 space-y-4 shadow-sm">
-              <h3 className="text-base font-bold">⭐ Google Maps Review Requests</h3>
-              <p className="font-mono text-[11px] bg-amber-50 p-2 rounded border border-amber-200 select-all overflow-x-auto text-amber-900">{MAPS}</p>
-              <div className="divide-y divide-slate-100">
-                {patients.map(p => {
-                  const t = `Hello ${p.name}, thank you for choosing Dr. Rabia's Dental Care in Tindivanam. If you had a comfortable visit, please share a quick review on Google: ${MAPS}`;
-                  return (
-                    <div key={p.id} className="py-3 flex items-center justify-between text-xs">
+                    {/* Voice Audio Recording */}
+                    <div className="border-t pt-4 flex flex-wrap items-center justify-between gap-3" style={{ borderColor: "var(--line)" }}>
                       <div>
-                        <p className="font-bold">{p.name}</p>
-                        <p className="text-slate-500">📞 {p.phone}</p>
+                        <p className="text-sm font-semibold">Doctor Voice Audio Memo</p>
+                        <p className="text-[11.5px] text-slate-500">Stored safely in local database for this exact sitting.</p>
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => sms(p.phone, t)} className="px-3 py-2 bg-slate-800 text-white rounded-lg font-semibold">SMS</button>
-                        <button onClick={() => wa(p.phone, t)} className="px-3 py-2 bg-emerald-600 text-white rounded-lg font-semibold">WhatsApp</button>
-                      </div>
+                      {!rec ? (
+                        <button type="button" onClick={startRec} className="btn btn-rec" style={{ minHeight: 40 }}><Icon n="mic" s={15} /> Record Memo</button>
+                      ) : (
+                        <button type="button" onClick={stopRec} className="btn btn-d" style={{ minHeight: 40 }}><Icon n="stop" s={13} style={{ fill: "#ff6b5e", color: "#ff6b5e" }} /> Stop & Save</button>
+                      )}
                     </div>
-                  );
-                })}
+                    {audioPreview && <audio controls src={audioPreview} className="w-full h-9 mt-1"></audio>}
+                  </div>
+
+                  {/* Tamil Booklet Instructions */}
+                  <div className="rounded-lg p-4" style={{ background: "var(--warnbg)", border: "1px solid var(--warnln)" }}>
+                    <h4 className="text-xs font-bold mb-1.5 ta" style={{ color: "var(--warn)" }}>பல் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை (Booklet Summary)</h4>
+                    <p className="text-xs whitespace-pre-line leading-relaxed ta" style={{ color: "#4a3410" }}>{tamilFor(op.department)}</p>
+                  </div>
+
+                  <div>
+                    <label className="lbl">Operatory Notes (Optional)</label>
+                    <input value={op.notes} onChange={e => setOp({ ...op, notes: e.target.value })} className="inp" placeholder="e.g. Canals prepared to 21mm, temporized with Cavit" />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                    <button className="btn btn-p btn-lg flex-1"><Icon n="check" s={16} w={2.2} /> Complete & Send to Reception</button>
+                    <button type="button" onClick={() => chairPt && wa(chairPt.phone, aftercareMsg(chairPt.name, op.procedure, op.teeth.join(", ") || "General", op.department))} className="btn btn-ok btn-lg"><Icon n="message" s={16} /> Send Aftercare on WhatsApp</button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {/* TAB 5: REMINDERS */}
+            {tab === 5 && (
+              <div className="space-y-3 max-w-4xl">
+                {reminders.map(r => (
+                  <div key={r.id} className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={r.status === "Pending" ? { borderLeft: "4px solid #e0a93a" } : { background: "#f7f9fc" }}>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm">{r.patientName}</span>
+                        <span className={`badge ${r.status === "Pending" ? "b-w" : "b-o"}`}>{r.status}</span>
+                      </div>
+                      <p className="text-xs font-medium mt-0.5" style={{ color: "var(--acc)" }}>{r.type}</p>
+                      <p className="text-xs text-slate-600 mt-1.5 max-w-xl leading-relaxed">"{r.message}"</p>
+                      <p className="text-[11.5px] text-slate-400 mt-1.5 flex items-center gap-1.5">{r.timing} · <Icon n="phone" s={11} /> {r.phone}</p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button onClick={() => sms(r.phone, r.message, r.id)} className="btn btn-d"><Icon n="send" s={13} /> SMS</button>
+                      <button onClick={() => wa(r.phone, r.message)} className="btn btn-ok"><Icon n="message" s={13} /> WhatsApp</button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          )}
+            )}
 
-        </main>
+            {/* TAB 6: GOOGLE REVIEWS */}
+            {tab === 6 && (
+              <div className="max-w-3xl card">
+                <div className="card-h"><h3 className="card-t flex items-center gap-2"><Icon n="star" s={16} style={{ color: "#d99a1c" }} /> Google Maps Review Requests</h3></div>
+                <div className="card-b space-y-4">
+                  <p className="text-xs rounded-md p-2.5 select-all overflow-x-auto" style={{ background: "var(--warnbg)", border: "1px solid var(--warnln)", color: "var(--warn)" }}>{MAPS}</p>
+                  <div className="divide">
+                    {patients.map(p => {
+                      const t = `Hello ${p.name}, thank you for choosing Dr. Rabia's Dental Care in Tindivanam. If you had a comfortable visit, please share a quick review on Google: ${MAPS}`;
+                      return (
+                        <div key={p.id} className="py-3.5 flex items-center justify-between gap-3 text-xs">
+                          <div>
+                            <p className="font-semibold text-[13px]">{p.name}</p>
+                            <p className="text-slate-500 flex items-center gap-1.5 mt-0.5"><Icon n="phone" s={12} /> {p.phone}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={() => sms(p.phone, t)} className="btn btn-d"><Icon n="send" s={13} /> SMS</button>
+                            <button onClick={() => wa(p.phone, t)} className="btn btn-ok"><Icon n="message" s={13} /> WhatsApp</button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
 
-        <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
-          Powered by <strong className="text-slate-700">Nexus Digital Hub</strong> ({PHONE})
-        </footer>
+          <footer className="bg-white border-t py-3.5 text-center text-xs text-slate-400" style={{ borderColor: "var(--line)" }}>
+            Powered by <strong className="text-slate-700">Nexus Digital Hub</strong> ({PHONE})
+          </footer>
+        </div>
       </div>
 
       {/* PRINT PREVIEW MODAL */}
       {printModalPt && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col my-auto border border-slate-200">
-            <div className="bg-slate-900 text-white px-5 py-3.5 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🖨️</span>
-                <span className="text-sm font-bold">Official Prescription Slip Preview</span>
+        <div className="app-chrome overlay z-50 overflow-y-auto" style={{ zIndex: 50 }}>
+          <div className="bg-white rounded-xl max-w-2xl w-full overflow-hidden flex flex-col my-auto" style={{ boxShadow: "0 24px 60px rgba(0,0,0,.4)" }}>
+            <div className="text-white px-5 py-3.5 flex justify-between items-center" style={{ background: "var(--nav)" }}>
+              <div className="flex items-center gap-2.5">
+                <Icon n="printer" s={18} />
+                <span className="text-sm font-semibold">Official Prescription Slip Preview</span>
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow"
-                >
-                  Send to Printer / Save PDF
+                <button type="button" onClick={() => window.print()} className="btn btn-p" style={{ background: "#14a89c" }}>
+                  <Icon n="printer" s={14} /> Send to Printer / Save PDF
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setPrintModalPt(null)}
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition"
-                >
-                  ✕ Close
+                <button type="button" onClick={() => setPrintModalPt(null)} className="btn" style={{ background: "rgba(255,255,255,.1)", color: "#dbe6f3" }}>
+                  <Icon n="x" s={14} /> Close
                 </button>
               </div>
             </div>
 
-            <div className="p-6 overflow-y-auto max-h-[75vh] bg-slate-100">
-              <div className="bg-white p-6 rounded-xl shadow border border-slate-200 text-xs">
-                <div className="border-b-2 border-teal-700 pb-3 mb-3 flex justify-between items-start">
+            <div className="p-5 overflow-y-auto max-h-[75vh]" style={{ background: "#e9eef4" }}>
+              <div className="bg-white p-7 rounded-md text-xs" style={{ boxShadow: "0 1px 4px rgba(15,28,46,.15)" }}>
+                <div className="border-b-2 pb-3.5 mb-4 flex justify-between items-start gap-3" style={{ borderColor: "#0f766e" }}>
                   <div>
-                    <h2 className="text-lg font-bold text-teal-800 m-0">Dr. Rabia's Dental Care</h2>
+                    <h2 className="text-lg font-bold m-0" style={{ color: "#0f766e" }}>Dr. Rabia's Dental Care</h2>
                     <p className="text-[11px] text-slate-600 mt-0.5">Multi-Speciality Dental Clinic & Implant Centre · Tindivanam</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Ph: {PHONE}</p>
+                    <p className="text-[10.5px] text-slate-500 mt-0.5">Ph: {PHONE}</p>
                   </div>
-                  <div className="text-right text-[10px]">
+                  <div className="text-right text-[10.5px]">
                     <p className="text-xs font-bold m-0">Date: {lvModal?.date || "Today"}</p>
-                    <p className="font-mono text-slate-600 mt-0.5">Chart No: {modalPt?.chartNo}</p>
-                    <p className="font-bold text-teal-800 mt-0.5">{lvModal?.department || "Dental Surgery"}</p>
+                    <p className="text-slate-600 mt-0.5">Chart No: {modalPt?.chartNo}</p>
+                    <p className="font-bold mt-0.5" style={{ color: "#0f766e" }}>{lvModal?.department || "Dental Surgery"}</p>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 p-2.5 rounded-lg mb-3 flex justify-between border border-slate-200 text-[11px]">
+                <div className="well p-3 mb-4 flex flex-wrap justify-between gap-2 text-[11px]">
                   <div><strong>Patient:</strong> {modalPt?.name} ({modalPt?.age ? `${modalPt.age}y` : "Adult"} / {modalPt?.gender || "Female"})</div>
                   <div><strong>Phone:</strong> {modalPt?.phone}</div>
                   <div><strong>Tooth:</strong> #{lvModal?.tooth || "N/A"}</div>
                 </div>
 
-                {lvModal && <p className="mb-2 text-[11px]"><strong>Procedure:</strong> {lvModal.procedure}</p>}
+                {lvModal && <p className="mb-2.5 text-[11px]"><strong>Procedure:</strong> {lvModal.procedure}</p>}
 
-                <div className="text-[11px] font-bold text-slate-700 border-b pb-1 mb-2">
+                <div className="text-[11.5px] font-bold text-slate-700 border-b pb-1.5 mb-2.5">
                   ℞ Therapeutic Composition / Active Salt Formulation
                 </div>
-                <div className="border border-slate-200 rounded-lg p-2.5 mb-3 bg-white space-y-2">
-                  {(lvModal?.medicines || []).map((m, i) => (
-                    <div key={i} className="pb-1.5 border-b border-dashed border-slate-200 last:border-b-0 text-[11px]">
+                <div className="border rounded-md px-3 py-1 mb-4 bg-white" style={{ borderColor: "var(--line)" }}>
+                  {(lvModal?.medicines || []).map((m, i, arr) => (
+                    <div key={i} className="py-2 text-[11px]" style={{ borderBottom: i === arr.length - 1 ? "none" : "1px dashed #cbd5e1" }}>
                       <div className="flex justify-between items-start gap-2">
                         <span className="font-bold text-slate-900">
                           {i + 1}. {composition(m)}{isCombo(m) ? " — Fixed-Dose Combination" : ""}
                         </span>
-                        <span className="font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 whitespace-nowrap">
+                        <span className="font-bold px-2 py-0.5 rounded whitespace-nowrap" style={{ color: "#0f766e", background: "#f0fdfa", border: "1px solid #ccfbf1" }}>
                           [ {doseStr(m, " — ")} ]
                         </span>
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">
+                      <div className="text-[10.5px] text-slate-500 mt-0.5">
                         {m.timing} · {m.days} day{m.days > 1 ? "s" : ""} course
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="border border-amber-300 p-3 rounded-lg bg-amber-50 mb-4 text-[10.5px]">
-                  <p className="font-bold text-amber-900 mb-1">பல் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை (Post-Treatment Care)</p>
-                  <p className="text-slate-800 whitespace-pre-line leading-relaxed">{tamilFor(lvModal?.department)}</p>
+                <div className="p-3 rounded-md mb-5 text-[10.5px]" style={{ background: "#fefce8", border: "1px solid #e5d9a0" }}>
+                  <p className="font-bold mb-1 ta" style={{ color: "#854d0e" }}>பல் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை (Post-Treatment Care)</p>
+                  <p className="text-slate-800 whitespace-pre-line leading-relaxed ta">{tamilFor(lvModal?.department)}</p>
                 </div>
 
-                <div className="flex justify-between items-end pt-2 border-t border-dashed border-slate-300 text-[10px]">
+                <div className="flex justify-between items-end pt-3 border-t border-dashed border-slate-300 text-[10.5px]">
                   <div>
                     <p className="font-bold text-slate-800">Clinical record verified</p>
                     <p className="text-slate-500">Medicines are dispensed at the Clinic Pharmacy Counter</p>
                   </div>
                   <div className="text-center">
                     <p className="font-bold text-slate-900">Dr. Rabia, B.D.S.</p>
-                    <p className="text-[9px] text-slate-500">Dental Surgeon · Reg. No: State Dental Council</p>
+                    <p className="text-[9.5px] text-slate-500">Dental Surgeon · Reg. No: State Dental Council</p>
                   </div>
                 </div>
               </div>
@@ -1305,8 +1451,8 @@ function App() {
         </div>
       )}
 
-      {/* RECEPTION PRINTABLE A4 SLIP */}
-      <div id="reception-rx-sheet" style={{ fontFamily: "'Plus Jakarta Sans','Noto Sans Tamil',sans-serif", padding: 8 }}>
+      {/* OFFICIAL RECEPTION PRINTABLE A4 SLIP */}
+      <div id="reception-rx-sheet" style={{ fontFamily: "'Inter','Noto Sans Tamil',sans-serif", padding: 8 }}>
         <div style={{ borderBottom: "2px solid #0f766e", paddingBottom: 10, marginBottom: 14, display: "flex", justifyContent: "space-between" }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, color: "#0f766e" }}>Dr. Rabia's Dental Care</div>
@@ -1315,7 +1461,7 @@ function App() {
           </div>
           <div style={{ textAlign: "right", fontSize: 10 }}>
             <div style={{ fontSize: 11, fontWeight: 700 }}>Date: {lvModal?.date || "Today"}</div>
-            <div style={{ fontFamily: "monospace" }}>Chart No: {modalPt?.chartNo}</div>
+            <div>Chart No: {modalPt?.chartNo}</div>
             <div style={{ fontWeight: 700, color: "#0f766e" }}>{lvModal?.department || "Dental Surgery"}</div>
           </div>
         </div>
@@ -1337,7 +1483,7 @@ function App() {
             <div key={i} style={{ padding: "7px 0", borderBottom: i === arr.length - 1 ? "none" : "1px dashed #cbd5e1", fontSize: 11 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
                 <span style={{ fontWeight: 700, color: "#0f172a" }}>{i + 1}. {composition(m)}{isCombo(m) ? " — Fixed-Dose Combination" : ""}</span>
-                <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0f766e", background: "#f0fdfa", padding: "2px 6px", borderRadius: 4, border: "1px solid #ccfbf1", whiteSpace: "nowrap" }}>[ {doseStr(m, " — ")} ]</span>
+                <span style={{ fontWeight: 700, color: "#0f766e", background: "#f0fdfa", padding: "2px 6px", borderRadius: 4, border: "1px solid #ccfbf1", whiteSpace: "nowrap" }}>[ {doseStr(m, " — ")} ]</span>
               </div>
               <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>{m.timing} · {m.days} day{m.days > 1 ? "s" : ""} course</div>
             </div>
@@ -1360,7 +1506,6 @@ function App() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
