@@ -1,914 +1,1371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dr. Rabia's Dental Care — Clinic Management Portal</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0fdfa',
-              100: '#ccfbf1',
-              500: '#14b8a6',
-              600: '#0d9488',
-              700: '#0f766e',
-              800: '#115e59',
-              900: '#134e4a',
-            },
-            clinical: {
-              navy: '#0f172a',
-              card: '#ffffff',
-              border: '#e2e8f0',
-              bg: '#f8fafc'
-            }
-          }
-        }
-      }
-    }
-  </script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dr. Rabia's Dental Care — Clinic Management Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;600;700&display=swap');
+body { font-family: 'Plus Jakarta Sans', 'Noto Sans Tamil', sans-serif; background: #f8fafc; margin: 0; }
+.ta { font-family: 'Noto Sans Tamil', 'Plus Jakarta Sans', sans-serif; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  <!-- React 18 & ReactDOM -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  
-  <!-- Babel Standalone -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-  </style>
+#reception-rx-sheet { display: none; }
+
+@media print {
+  @page { size: A4 portrait; margin: 10mm; }
+  html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+  .app-chrome { display: none !important; }
+  #reception-rx-sheet {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    background: #fff !important;
+    color: #000 !important;
+    page-break-inside: avoid !important;
+  }
+}
+</style>
 </head>
 <body>
-  <div id="root"></div>
+<div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
 
-    // Dr. Rabia's Official Google Maps URL for Tindivanam
-    const DR_RABIA_MAPS_URL = "https://maps.app.goo.gl/tfGJDqvsVLSDXF8f9";
+const MAPS = "https://maps.app.goo.gl/tfGJDqvsVLSDXF8f9";
+const PHONE = "+91 9363403175";
+const CREDS = [
+  { user: "admin", pass: "drrabia@2026", role: "Doctor", name: "Dr. Rabia" },
+  { user: "staff", pass: "clinic@123", role: "Receptionist", name: "Clinic Front Desk" }
+];
 
-    // Authorized Staff Credentials
-    const CLINIC_CREDENTIALS = [
-      { user: "admin", pass: "drrabia@2026", role: "Doctor", name: "Dr. Rabia" },
-      { user: "staff", pass: "clinic@123", role: "Receptionist", name: "Clinic Front Desk" }
-    ];
+const TEETH = {
+  ur: [18,17,16,15,14,13,12,11], ul: [21,22,23,24,25,26,27,28],
+  lr: [48,47,46,45,44,43,42,41], ll: [31,32,33,34,35,36,37,38]
+};
 
-    // Initial Pre-loaded Data
-    const INITIAL_PATIENTS = [
-      {
-        id: "p1",
-        name: "Suresh Kumar",
-        phone: "9876543210",
-        age: 38,
-        gender: "Male",
-        medicalHistory: "Mild Hypertension",
-        complaint: "Severe pain in lower right molar (Tooth #46)",
-        visits: [
-          {
-            date: "04 Oct, 2026",
-            procedure: "Single-Sitting RCT",
-            tooth: "46",
-            notes: "Canal extirpation completed. Temporary dressing placed. Mild tenderness expected.",
-            prescription: "Amoxicillin 500mg, Ketorol-DT SOS"
-          }
-        ]
-      },
-      {
-        id: "p2",
-        name: "Priya Sharma",
-        phone: "9840123456",
-        age: 29,
-        gender: "Female",
-        medicalHistory: "None",
-        complaint: "Wisdom tooth impingement & pericoronitis",
-        visits: [
-          {
-            date: "05 Oct, 2026",
-            procedure: "Surgical Extraction",
-            tooth: "38",
-            notes: "Surgical extraction with 1 suture. Pressure pack placed.",
-            prescription: "Zerodol-SP BD x 3 days, Chlorohexidine mouthwash"
-          }
-        ]
-      },
-      {
-        id: "p3",
-        name: "Anita Raman",
-        phone: "9363403175",
-        age: 44,
-        gender: "Female",
-        medicalHistory: "Type 2 Diabetic",
-        complaint: "Calculus buildup, bleeding gums",
-        visits: [
-          {
-            date: "15 Apr, 2026",
-            procedure: "Ultrasonic Scaling",
-            tooth: "Full Mouth",
-            notes: "Deep supragingival calculus removed. Advised 6-month recall.",
-            prescription: "Hexidine mouth rinse, Sensodyne toothpaste"
-          }
-        ]
-      }
-    ];
+const DEFAULT_CATS = {
+  "Oral & Maxillofacial Surgery": [
+    "Routine Intra-Alveolar Extraction",
+    "Transalveolar Surgical Extraction",
+    "Odontectomy – Mesioangular Impaction",
+    "Odontectomy – Horizontal Impaction",
+    "Odontectomy – Vertical Impaction",
+    "Odontectomy – Distoangular Impaction",
+    "Odontectomy – Aberrant Impaction",
+    "Alveoloplasty with Interrupted Suturing",
+    "Incision & Drainage (Vestibular Abscess)",
+    "Incision & Drainage (Fascial Space Abscess)",
+    "Apicoectomy & Retrograde MTA Seal",
+    "Periapical Curettage",
+    "Laser / Surgical Operculectomy",
+    "Suture Removal & Antiseptic Irrigation",
+    "Dry Socket Dressing (Alveogyl)",
+    "Labial Frenectomy",
+    "Lingual Frenectomy",
+    "Enucleation of Periapical Cyst"
+  ],
+  "Conservative Dentistry & Endodontics": [
+    "Single-Sitting Root Canal Treatment (RCT)",
+    "Multi-Stage RCT (Access Prep & BMP)",
+    "Re-Root Canal Treatment (Re-RCT)",
+    "Composite Class I Restoration",
+    "Composite Class II Restoration",
+    "Composite Class III Restoration",
+    "Composite Class IV Restoration",
+    "Composite Class V Cervical Restoration",
+    "GIC Type II Aesthetic Restoration",
+    "GIC Type IX Posterior Restoration",
+    "GIC Miracle Mix Core Build-up",
+    "Fiber Post & Core Cementation",
+    "Direct Pulp Capping (MTA)",
+    "Indirect Pulp Capping (MTA)",
+    "Biodentine Dentine Substitute",
+    "Ceramic Inlay / Onlay",
+    "Vital Tooth Bleaching (In-Office)"
+  ],
+  "Periodontics": [
+    "Full Mouth Ultrasonic Scaling & Polishing",
+    "Subgingival Scaling & Root Planing (Quadrant)",
+    "Modified Widman Flap Surgery",
+    "Aesthetic Crown Lengthening with Osteotomy",
+    "Gingivectomy & Gingivoplasty",
+    "Local Drug Delivery (Chlorhexidine Chip)",
+    "Local Drug Delivery (Minocycline)",
+    "Gingival Melanin Depigmentation"
+  ],
+  "Prosthodontics": [
+    "Crown Preparation & Marginal Gingival Retraction",
+    "PFM (Porcelain Fused to Metal) Cementation",
+    "CAD/CAM Monolithic Full Zirconia Crown",
+    "Layered Aesthetic Zirconia Crown",
+    "E-Max Lithium Disilicate Ceramic Crown",
+    "Fixed Partial Denture (3-to-5 Unit Bridge)",
+    "Complete Denture (Maxillary / Mandibular)",
+    "Cast Partial Denture (Cobalt-Chromium)",
+    "Flexible Valplast Denture",
+    "Porcelain Laminate Veneers"
+  ],
+  "Pedodontics": [
+    "Deciduous Milk Tooth Extraction",
+    "Pulpotomy with Formocresol / MTA",
+    "Pulpectomy with Metapex Obturation",
+    "Stainless Steel Preformed Crown",
+    "Strip Crown Aesthetic Restoration",
+    "Topical APF Fluoride Gel Application",
+    "Resin Pit & Fissure Sealants",
+    "Band & Loop Space Maintainer"
+  ],
+  "Implant Dentistry": [
+    "Endosseous Titanium Implant Placement",
+    "Immediate Extraction Socket Implant",
+    "Stage-2 Healing Abutment Uncovering",
+    "Closed Tray Transfer Impression",
+    "Open Tray Transfer Impression",
+    "Screw-Retained Implant Prosthesis",
+    "Cement-Retained Implant Prosthesis"
+  ],
+  "Orthodontics": [
+    "Diagnostic Study Model & Cephalometric Tracing",
+    "Fixed MBT Bracket Bonding (Bimaxillary)",
+    "Archwire Change & Powerchain Activation",
+    "Hawley's Removable Retainer Delivery",
+    "Fixed Lingual Bonded Retainer",
+    "Clear Aligner Scanning & Attachment Placement"
+  ]
+};
 
-    const INITIAL_REMINDERS = [
-      {
-        id: "rem-1",
-        patientName: "Suresh Kumar",
-        phone: "9876543210",
-        type: "Next-Sitting Reminder (2h before)",
-        timing: "Due Now",
-        status: "Pending",
-        message: "Dr. Rabia's Dental Care, Tindivanam: Hello Suresh, reminder for your RCT Sitting 2 today at 11:30 AM with Dr. Rabia. Kindly be on time."
-      },
-      {
-        id: "rem-2",
-        patientName: "Priya Sharma",
-        phone: "9840123456",
-        type: "Post-Op Care Check-in (6h post-op)",
-        timing: "Due at 6:00 PM",
-        status: "Pending",
-        message: "Dr. Rabia's Dental Care: Hello Priya, Dr. Rabia hopes you are comfortable after your extraction. Avoid spitting or hot drinks today. Contact clinic if pain persists."
-      },
-      {
-        id: "rem-3",
-        patientName: "Anita Raman",
-        phone: "9363403175",
-        type: "6-Month Dental Checkup Recall",
-        timing: "Due Today",
-        status: "Pending",
-        message: "Dr. Rabia's Dental Care: Hello Anita, it has been 6 months since your last scaling. Keep your gums healthy by scheduling a routine checkup."
-      }
-    ];
+const DRUG_GROUPS = {
+  "Analgesics & NSAIDs": [
+    "Zerodol-SP|Tab. Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg",
+    "Zerodol-P|Tab. Aceclofenac 100 mg + Paracetamol 325 mg",
+    "Ketorol-DT|Tab. Ketorolac Tromethamine 10 mg (Dispersible)|001|SOS (Only if Pain)|2",
+    "Ultracet|Tab. Tramadol 37.5 mg + Paracetamol 325 mg|001|SOS (Only if Pain)|2",
+    "Hifenac-SP|Tab. Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg",
+    "Hifenac-D|Tab. Aceclofenac 100 mg + Diclofenac Sodium 50 mg",
+    "Combiflam|Tab. Ibuprofen 400 mg + Paracetamol 325 mg",
+    "Dolo-650|Tab. Paracetamol 650 mg",
+    "Calpol 500|Tab. Paracetamol 500 mg",
+    "Voveran 50|Tab. Diclofenac Sodium 50 mg",
+    "Voveran SR 100|Tab. Diclofenac Sodium SR 100 mg|100",
+    "Signoflam|Tab. Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg",
+    "Enzoflam|Tab. Diclofenac Sodium 50 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg",
+    "Ibugesic-Plus|Tab. Ibuprofen 400 mg + Paracetamol 325 mg",
+    "Tramazac|Cap. Tramadol Hydrochloride 50 mg|001|SOS (Only if Pain)|2",
+    "Dynapar AQ|Inj. Diclofenac Sodium 75 mg / 3 ml (Intramuscular)|100|SOS (Only if Pain)|1",
+    "Dolonex DT|Tab. Piroxicam 20 mg (Dispersible)|100|After Food|3"
+  ],
+  "Antibiotics & Antimicrobials": [
+    "Amoxicillin 500|Cap. Amoxicillin 500 mg|111|After Food|5",
+    "Amoxicillin 250|Cap. Amoxicillin 250 mg|111|After Food|5",
+    "Augmentin 625|Tab. Amoxicillin 500 mg + Clavulanic Acid 125 mg|101|After Food|5",
+    "Augmentin 375|Tab. Amoxicillin 250 mg + Clavulanic Acid 125 mg|101|After Food|5",
+    "Augmentin Duo|Oral Susp. Amoxicillin 200 mg + Clavulanic Acid 28.5 mg per 5 ml|101|After Food|5",
+    "Clavam 625|Tab. Amoxicillin 500 mg + Clavulanic Acid 125 mg|101|After Food|5",
+    "Moxikind-CV 625|Tab. Amoxicillin 500 mg + Potassium Clavulanate 125 mg|101|After Food|5",
+    "Flagyl 400|Tab. Metronidazole 400 mg|111|After Food|3",
+    "Flagyl 200|Tab. Metronidazole 200 mg|111|After Food|3",
+    "Metrogyl 400|Tab. Metronidazole 400 mg|111|After Food|3",
+    "Dalacin-C 300|Cap. Clindamycin 300 mg|111|After Food|5",
+    "Dalacin-C 150|Cap. Clindamycin 150 mg|111|After Food|5",
+    "Taxim-O 200|Tab. Cefixime 200 mg|101|After Food|5",
+    "Taxim-O 100|Tab. Cefixime 100 mg|101|After Food|5",
+    "Cifran 500|Tab. Ciprofloxacin 500 mg|101|After Food|5",
+    "Oflox-OZ|Tab. Ofloxacin 200 mg + Ornidazole 500 mg|101|After Food|5",
+    "Zenflox-OZ|Tab. Ofloxacin 200 mg + Ornidazole 500 mg|101|After Food|5",
+    "Azithral 500|Tab. Azithromycin 500 mg|100|Before Food|3",
+    "Azithral 250|Tab. Azithromycin 250 mg|100|Before Food|5",
+    "Doxy-1 L-DR Forte|Cap. Doxycycline 100 mg + Lactic Acid Bacillus|100|After Food|5",
+    "Ceftum 500|Tab. Cefuroxime Axetil 500 mg|101|After Food|5",
+    "Ceftum 250|Tab. Cefuroxime Axetil 250 mg|101|After Food|5",
+    "Erythrocin 500|Tab. Erythromycin Stearate 500 mg|101|After Food|5",
+    "Ampiclox|Cap. Ampicillin 250 mg + Cloxacillin 250 mg|111|Before Food|5"
+  ],
+  "Gastro-Protective & Antacids": [
+    "Pan-40|Tab. Pantoprazole 40 mg (Gastro-Resistant)|100|Before Food|3",
+    "Pan-DSR|Cap. Pantoprazole 40 mg + Domperidone SR 30 mg|100|Before Food|3",
+    "Pantocid 40|Tab. Pantoprazole Sodium 40 mg|100|Before Food|3",
+    "Razo-20|Tab. Rabeprazole Sodium 20 mg|100|Before Food|3",
+    "Razo-D|Cap. Rabeprazole 20 mg + Domperidone SR 30 mg|100|Before Food|3",
+    "Omee 20|Cap. Omeprazole 20 mg|100|Before Food|3",
+    "Omez-D|Cap. Omeprazole 20 mg + Domperidone 10 mg|100|Before Food|3",
+    "Rabekind 20|Tab. Rabeprazole Sodium 20 mg|100|Before Food|3",
+    "Gelusil MPS|Susp. Aluminium Hydroxide + Magnesium Hydroxide + Simethicone|111|After Food|3",
+    "Digene Gel|Susp. Magaldrate + Simethicone|111|After Food|3",
+    "Mucaine Gel|Susp. Oxetacaine + Aluminium Hydroxide + Magnesium Hydroxide|111|Before Food|3",
+    "Sucrafil Suspension|Susp. Sucralfate 1 g per 10 ml|101|Before Food|5"
+  ],
+  "Proteolytic Enzymes & Anti-Edema": [
+    "Chymoral Forte|Tab. Trypsin-Chymotrypsin 100,000 Armour Units|111|Before Food|3",
+    "Chymoral Plus|Tab. Trypsin-Chymotrypsin + Diclofenac Sodium 50 mg|101|After Food|3",
+    "Enzomac|Tab. Bromelain 90 mg + Trypsin 48 mg + Rutoside 100 mg",
+    "Enzomac Plus|Tab. Bromelain + Trypsin + Rutoside + Diclofenac Sodium 50 mg",
+    "Serrata 10|Tab. Serratiopeptidase 10 mg"
+  ],
+  "Mouthwashes, Gels & Topicals": [
+    "Hexidine 0.2%|Chlorhexidine Gluconate Mouthwash 0.2% w/v|101|After Food|7",
+    "Rexidin Plus|Chlorhexidine Gluconate Mouthwash 0.2% w/v (with adjuncts)|101|After Food|7",
+    "Clohex|Chlorhexidine Gluconate Mouthwash 0.2% w/v|101|After Food|7",
+    "Betadine 2% Gargle|Povidone-Iodine Gargle 2% w/v|101|After Food|5",
+    "Dologel-CT|Choline Salicylate + Lidocaine Oral Gel|111|After Food|5",
+    "Mucopain|Benzocaine Oral Gel|111|After Food|5",
+    "Kenacort 0.1%|Triamcinolone Acetonide Oral Paste 0.1%|101|After Food|5",
+    "Orasore Gel|Choline Salicylate + Lidocaine Oral Gel|111|After Food|5",
+    "Candid Mouth Paint|Clotrimazole 1% Oral Paint|101|After Food|7",
+    "Zytee RB|Choline Salicylate + Benzalkonium Chloride Oral Gel|111|After Food|5",
+    "Metrogyl-DG|Metronidazole 1% + Chlorhexidine 0.25% Gum Gel|101|After Food|7",
+    "Sensodyne Rapid|Strontium Acetate Desensitising Dentifrice|101|After Food|14",
+    "Thermoseal-RA|Potassium Nitrate Desensitising Dentifrice|101|After Food|14",
+    "Elgydium|Chlorhexidine Gluconate Dental Gel Dentifrice|101|After Food|14"
+  ],
+  "Muscle Relaxants, Hemostatics & Emergency": [
+    "Myoril 4mg|Cap. Thiocolchicoside 4 mg|101|After Food|3",
+    "Myoril 8mg|Cap. Thiocolchicoside 8 mg|101|After Food|3",
+    "Muscodac|Tab. Thiocolchicoside 4 mg + Aceclofenac 100 mg|101|After Food|3",
+    "Tranexa 500|Tab. Tranexamic Acid 500 mg|101|After Food|3",
+    "Pause 500|Tab. Tranexamic Acid 500 mg|101|After Food|3",
+    "Styptovit-E|Tab. Haemostatic Vitamin Combination|101|After Food|3",
+    "Botroclot Gauze|Batroxobin Topical Haemostatic Gauze|100|After Food|1",
+    "Botroclot Drops|Batroxobin Topical Haemostatic Solution|100|After Food|1",
+    "Dexona 0.5|Tab. Dexamethasone 0.5 mg|100|After Food|2",
+    "Dexona 2mg|Tab. Dexamethasone 2 mg|100|After Food|2",
+    "Wysolone 5|Tab. Prednisolone 5 mg|100|After Food|3",
+    "Wysolone 10|Tab. Prednisolone 10 mg|100|After Food|3",
+    "Wysolone 20|Tab. Prednisolone 20 mg|100|After Food|3",
+    "Avil 25|Tab. Pheniramine Maleate 25 mg|001|After Food|2",
+    "Adrenaline 1:1000|Inj. Adrenaline 1 mg / ml (Emergency Use)|100|SOS (Only if Pain)|1",
+    "Calcium Sandoz|Effervescent Tab. Calcium Lactate Gluconate|100|After Food|14",
+    "Shelcal 500|Tab. Calcium Carbonate 500 mg + Vitamin D3|001|After Food|14"
+  ],
+  "Pediatric Formulations": [
+    "Syp Ibugesic-Plus|Oral Susp. Ibuprofen 100 mg + Paracetamol 162.5 mg per 5 ml|101|After Food|3",
+    "Syp Novamox 125|Oral Susp. Amoxicillin 125 mg per 5 ml|111|After Food|5",
+    "Syp Novamox 250|Oral Susp. Amoxicillin 250 mg per 5 ml|111|After Food|5",
+    "Syp Augmentin Duo|Oral Susp. Amoxicillin 200 mg + Clavulanic Acid 28.5 mg per 5 ml|101|After Food|5",
+    "Syp Meftal-P|Oral Susp. Mefenamic Acid 50 mg + Paracetamol 125 mg per 5 ml|101|After Food|3"
+  ]
+};
 
-    const POST_OP_PRESETS = {
-      "Surgical Extraction": "1. Keep the gauze pack pressed firmly for 45 minutes.\n2. Do NOT spit, suck with a straw, or smoke for 24 hours.\n3. Consume only cool/soft foods today.\n4. Take prescribed medicines strictly after food.",
-      "Single-Sitting RCT": "1. Avoid chewing hard foods on the treated side for 48 hours.\n2. Mild soreness or tenderness is completely normal.\n3. Complete the prescribed antibiotic course as directed.",
-      "Dental Implant": "1. Maintain soft diet for 48 hours.\n2. Do not touch or disturb the surgical site with tongue or fingers.\n3. Apply cold pack externally on cheek if minor swelling occurs.",
-      "Ultrasonic Scaling": "1. Mild sensitivity to hot and cold is temporary and resolves in 24 hours.\n2. Use prescribed warm saline or mouthwash rinses starting tomorrow.",
-      "Crown Cementation": "1. Do not chew hard or sticky foods on the new crown for 24 hours.\n2. Floss normally around the tooth margins."
+const PRESETS = [
+  "Zerodol-SP",
+  "Augmentin 625",
+  "Pan-40",
+  "Flagyl 400",
+  "Ketorol-DT",
+  "Hexidine 0.2%",
+  "Dolo-650",
+  "Amoxicillin 500",
+  "Combiflam",
+  "Chymoral Forte",
+  "Taxim-O 200",
+  "Dologel-CT"
+];
+
+const parseDrug = (s) => {
+  const parts = s.split("|");
+  const brandName = parts[0];
+  const genericSalt = parts[1] || "";
+  const d = parts[2] || "101";
+  const timing = parts[3] || "After Food";
+  const days = Number(parts[4]) || 3;
+  return { brandName, genericSalt, m: d[0] === "1", a: d[1] === "1", n: d[2] === "1", timing, days };
+};
+
+const ALL_DRUGS = Object.entries(DRUG_GROUPS).flatMap(([g, l]) => l.map(x => ({ ...parseDrug(x), group: g })));
+const newMed = (d) => ({ ...d, id: "med_" + Date.now() + Math.random().toString(36).slice(2, 6) });
+const seedMed = (b) => {
+  const f = ALL_DRUGS.find(d => d.brandName === b);
+  return f ? newMed(f) : { id: "m_" + Date.now(), brandName: b, genericSalt: b, m: true, a: false, n: true, timing: "After Food", days: 3 };
+};
+
+const TIMINGS = ["Before Food", "After Food", "SOS (Only if Pain)", "Night Bedtime"];
+const CUSTOM_GROUP = "Clinic Stock (Custom)";
+
+const TAMIL_CORE = "1. வாயில் வைக்கப்பட்ட பஞ்சை (காஸ்) 45 நிமிடங்கள் அழுத்திக் கடிக்கவும்.\n2. 24 மணி நேரம் எச்சில் துப்பவோ, வேகமாக கொப்பளிக்கவோ, ஸ்ட்ரா பயன்படுத்தவோ வேண்டாம்.\n3. 24 மணி நேரத்திற்குப் பின் மிதமான வெந்நீரில் உப்பு கலந்து தினமும் 3–4 முறை மெதுவாக வாய் கொப்பளிக்கவும்.";
+const DEPT_TAMIL = {
+  "Oral": "4. சூடான உணவைத் தவிர்க்கவும்; குளிர்ந்த திரவம் / ஐஸ்கிரீம் எடுத்துக்கொள்ளலாம்.\n5. மருந்துகளை உணவுக்குப் பின் தவறாமல் உட்கொள்ளவும்.",
+  "Conservative": "4. சிகிச்சை செய்த பக்கத்தில் 48 மணி நேரம் கடினமான உணவை மெல்ல வேண்டாம்.\n5. லேசான கூச்சம் இயல்பானது; வலி நீடித்தால் கிளினிக்கைத் தொடர்பு கொள்ளவும்.",
+  "Periodontics": "4. பல் கூச்சம் 2–3 நாட்களில் சரியாகும். 3 மாதத்திற்கு ஒருமுறை பிரஷ் மாற்றவும்.",
+  "Prosthodontics": "4. புதிய பல் பொருத்திய 24 மணி நேரம் ஒட்டும் தன்மை கொண்ட உணவுகளைத் தவிர்க்கவும்.",
+  "Pedodontics": "4. மரத்துப்போன பகுதியைக் குழந்தை கடிக்காமல் பார்த்துக்கொள்ளவும்; மென்மையான குளிர்ந்த உணவு கொடுக்கவும்.",
+  "Implant": "4. அறுவை இடத்தை நாக்கால் தொடவோ அழுத்தவோ வேண்டாம்; புகை, மதுவைத் தவிர்க்கவும்.",
+  "Orthodontics": "4. முதல் சில நாட்கள் லேசான வலி இருக்கும்; மென்மையான உணவு உண்ணவும். ஒவ்வொரு உணவுக்குப் பின் பல் துலக்கவும்."
+};
+
+const tamilFor = (dept) => {
+  const k = Object.keys(DEPT_TAMIL).find(x => (dept || "").startsWith(x));
+  return TAMIL_CORE + (k ? "\n" + DEPT_TAMIL[k] : "");
+};
+
+const composition = (m) => (m && m.genericSalt) ? m.genericSalt : (m ? m.brandName : "");
+const isCombo = (m) => ((m && m.genericSalt) || "").includes(" + ");
+const doseStr = (m, sep = "-") => m ? [m.m, m.a, m.n].map(x => (x ? 1 : 0)).join(sep) : "1-0-1";
+
+const INITIAL_APPOINTMENTS = [
+  { id: "apt-1", name: "Sajitha", phone: "9876543210", age: 34, gender: "Female", date: "2026-10-07", time: "11:30 AM", doctor: "Dr. Rabia", complaint: "Wisdom tooth pericoronitis", status: "Confirmed" },
+  { id: "apt-2", name: "Najuma Beevi", phone: "9363403175", age: 51, gender: "Female", date: "2026-10-07", time: "04:30 PM", doctor: "Dr. Rabia", complaint: "Crown replacement & scaling", status: "Scheduled" }
+];
+
+const INITIAL_PATIENTS = [
+  { id: "p0", name: "Adhila Banu", phone: "9840123456", age: 23, gender: "Female", chartNo: "20261006_123851", medicalHistory: "None reported", allergies: [], conditions: [],
+    complaint: "Severe molar pain, lower left quadrant", status: "Ready for Rx Print",
+    dentalChart: { "38": { status: "Extracted", notes: "Odontectomy" } },
+    visits: [{ date: "06 Oct 2026", department: "Oral & Maxillofacial Surgery", procedure: "Routine Intra-Alveolar Extraction", tooth: "38", notes: "Distal impaction removed with primary closure.", medicines: [seedMed("Zerodol-SP"), seedMed("Pan-40")] }] },
+  { id: "p1", name: "Suresh Kumar", phone: "9876543210", age: 38, gender: "Male", chartNo: "20261005_202143", medicalHistory: "Mild Hypertension", allergies: ["Penicillin"], conditions: ["Hypertension"],
+    complaint: "Severe pain in lower right molar (#46)", status: "Completed",
+    dentalChart: { "46": { status: "RCT", notes: "Canal extirpation done" } },
+    visits: [{ date: "04 Oct 2026", department: "Conservative Dentistry & Endodontics", procedure: "Single-Sitting Root Canal Treatment (RCT)", tooth: "46", notes: "Biomechanical prep and obturation done.", medicines: [seedMed("Ketorol-DT")] }] }
+];
+
+const INITIAL_REMINDERS = [
+  { id: "rem-1", patientName: "Adhila Banu", phone: "9840123456", type: "Post-Op Check-in (6h)", timing: "Due at 6:00 PM", status: "Pending",
+    message: "Dr. Rabia's Dental Care: Hello Adhila, Dr. Rabia hopes you are comfortable. Avoid spitting or hot drinks today. Take prescribed medicines after food." },
+  { id: "rem-2", patientName: "Suresh Kumar", phone: "9876543210", type: "Next-Sitting Reminder", timing: "Due Tomorrow", status: "Pending",
+    message: "Dr. Rabia's Dental Care: Hello Suresh, reminder for your Tooth #46 crown sitting at 11:30 AM." }
+];
+
+const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+
+function Odontogram({ selected = [], onToggle, chart = {} }) {
+  const tooth = (num) => {
+    const s = String(num), st = chart[s]?.status, on = selected.includes(s);
+    let c = "bg-white text-slate-700 border-slate-300";
+    if (st === "RCT") c = "bg-amber-100 text-amber-900 border-amber-400 font-bold";
+    if (st === "Caries") c = "bg-rose-100 text-rose-900 border-rose-400 font-bold";
+    if (st === "Extracted") c = "bg-slate-200 text-slate-400 border-dashed border-slate-400 line-through";
+    if (on) c = "bg-teal-600 text-white border-teal-700 shadow font-bold";
+    return <button key={num} type="button" onClick={() => onToggle && onToggle(s)} title={`Tooth #${num}${st ? " (" + st + ")" : ""}`}
+      className={`w-8 h-11 sm:w-9 sm:h-12 text-[11px] rounded border transition ${c}`}>{num}</button>;
+  };
+  const row = (a, b, cls = "") => (
+    <div className={`flex justify-center items-center gap-1 overflow-x-auto no-scrollbar ${cls}`}>
+      <div className="flex gap-1">{a.map(tooth)}</div><div className="w-px h-8 bg-slate-300 mx-1"></div><div className="flex gap-1">{b.map(tooth)}</div>
+    </div>);
+  return (
+    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+      <p className="text-xs font-bold text-slate-600 mb-2">Odontogram — tap teeth to select</p>
+      {row(TEETH.ur, TEETH.ul, "pb-2 border-b border-dashed border-slate-300")}
+      {row(TEETH.lr, TEETH.ll, "pt-2")}
+    </div>);
+}
+
+const Field = ({ label, ...p }) => (
+  <div><label className="text-xs font-semibold text-slate-600">{label}</label>
+    <input {...p} className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none" /></div>);
+
+function App() {
+  const [user, setUser] = useState(() => { try { return JSON.parse(sessionStorage.getItem("rabia_auth_user")); } catch (e) { return null; } });
+  const [login, setLogin] = useState({ username: "", password: "" });
+  const [loginError, setLoginError] = useState("");
+  const [tab, setTab] = useState(4); // Default to Doctor Operatory tab
+  const [patients, setPatients] = useState(() => load("rabia_patients_v10", INITIAL_PATIENTS));
+  const [appts, setAppts] = useState(() => load("rabia_appts_v10", INITIAL_APPOINTMENTS));
+  const [reminders, setReminders] = useState(() => load("rabia_reminders_v10", INITIAL_REMINDERS));
+  const [toast, setToast] = useState(null);
+  const [q, setQ] = useState("");
+  const [sel, setSel] = useState(null);
+  const [printModalPt, setPrintModalPt] = useState(null);
+
+  // Taxonomy Custom Categories & Procedures
+  const [categories, setCategories] = useState(() => load("rabia_custom_cats_v10", DEFAULT_CATS));
+
+  const blankPt = { name: "", phone: "", age: "", gender: "Female", chartNo: "", complaint: "", allergies: "" };
+  const [newPt, setNewPt] = useState(blankPt);
+  const blankApt = { name: "", phone: "", date: "2026-10-07", time: "11:30 AM", doctor: "Dr. Rabia", complaint: "" };
+  const [newApt, setNewApt] = useState(blankApt);
+
+  const [op, setOp] = useState({
+    patientId: "p0",
+    department: "Oral & Maxillofacial Surgery",
+    procedure: "Routine Intra-Alveolar Extraction",
+    teeth: ["38"],
+    notes: ""
+  });
+
+  const [meds, setMeds] = useState([]);
+  const [rec, setRec] = useState(false);
+  const [audio, setAudio] = useState(null);
+  const mrRef = useRef(null), chunks = useRef([]);
+  const [custom, setCustom] = useState(() => load("rabia_custom_drugs_v10", []));
+  const [dq, setDq] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [cd, setCd] = useState({ brandName: "", genericSalt: "", timing: "After Food" });
+  const [showCatDrawer, setShowCatDrawer] = useState(false);
+
+  // Persist State
+  const persist = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  useEffect(() => persist("rabia_patients_v10", patients), [patients]);
+  useEffect(() => persist("rabia_appts_v10", appts), [appts]);
+  useEffect(() => persist("rabia_custom_drugs_v10", custom), [custom]);
+  useEffect(() => persist("rabia_reminders_v10", reminders), [reminders]);
+  useEffect(() => persist("rabia_custom_cats_v10", categories), [categories]);
+
+  const say = (msg) => { setToast({ msg }); setTimeout(() => setToast(null), 3000); };
+
+  const doLogin = (e) => {
+    e.preventDefault();
+    const c = CREDS.find(x => x.user === login.username.trim().toLowerCase() && x.pass === login.password);
+    if (!c) return setLoginError("Invalid credentials.");
+    const u = { user: c.user, role: c.role, name: c.name };
+    setUser(u); sessionStorage.setItem("rabia_auth_user", JSON.stringify(u)); setLoginError("");
+  };
+
+  const logout = () => { sessionStorage.removeItem("rabia_auth_user"); setUser(null); setLogin({ username: "", password: "" }); };
+
+  const allDrugs = [...ALL_DRUGS, ...custom];
+  const inRx = (b) => meds.some(m => m.brandName === b);
+  const tapDrug = (d) => {
+    if (inRx(d.brandName)) return say(`${d.brandName} is already added`);
+    setMeds(p => [...p, newMed(d)]);
+  };
+
+  const setMed = (id, patch) => setMeds(p => p.map(m => m.id === id ? { ...m, ...patch } : m));
+  const dropMed = (id) => setMeds(p => p.filter(m => m.id !== id));
+  const toggleTooth = (t) => setOp(p => ({ ...p, teeth: p.teeth.includes(t) ? p.teeth.filter(x => x !== t) : [...p.teeth, t] }));
+
+  // Dynamic Category & Procedure Addition
+  const handleAddNewCategory = () => {
+    const newCat = prompt("Enter new Dental Specialty Category name:");
+    if (!newCat || !newCat.trim()) return;
+    const catName = newCat.trim();
+    if (categories[catName]) return say("Category already exists");
+    
+    const initialProc = prompt(`Enter first procedure for "${catName}":`);
+    const procName = (initialProc && initialProc.trim()) ? initialProc.trim() : "General Consultation";
+    
+    const updated = { ...categories, [catName]: [procName] };
+    setCategories(updated);
+    setOp(prev => ({ ...prev, department: catName, procedure: procName }));
+    say(`Added specialty: ${catName}`);
+  };
+
+  const handleAddNewProcedure = () => {
+    const newProc = prompt(`Enter new procedure for current category (${op.department}):`);
+    if (!newProc || !newProc.trim()) return;
+    const procName = newProc.trim();
+    const existingList = categories[op.department] || [];
+    if (existingList.includes(procName)) return say("Procedure already exists in this category");
+
+    const updated = { ...categories, [op.department]: [...existingList, procName] };
+    setCategories(updated);
+    setOp(prev => ({ ...prev, procedure: procName }));
+    say(`Added procedure: ${procName}`);
+  };
+
+  // Voice recording
+  const startRec = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream); mrRef.current = mr; chunks.current = [];
+      mr.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
+      mr.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        const r = new FileReader();
+        r.onloadend = () => { setAudio(r.result); say("Voice memo attached"); };
+        r.readAsDataURL(new Blob(chunks.current, { type: mr.mimeType || "audio/webm" }));
+      };
+      mr.start(); setRec(true);
+    } catch (e) { alert("Microphone permission required for voice notes."); }
+  };
+  const stopRec = () => { if (mrRef.current && rec) { mrRef.current.stop(); setRec(false); } };
+
+  const saveTreatment = (e) => {
+    e.preventDefault();
+    const pt = patients.find(p => p.id === op.patientId) || patients[0];
+    if (!op.teeth.length) return say("Tap at least one tooth on the odontogram");
+    const tooth = op.teeth.join(", ");
+    const visit = {
+      date: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+      department: op.department,
+      procedure: op.procedure,
+      tooth,
+      notes: op.notes || "Procedure completed successfully.",
+      medicines: meds,
+      voiceMemo: audio
     };
+    const chart = { ...(pt.dentalChart || {}) };
+    op.teeth.forEach(t => {
+      chart[t] = { status: /RCT/.test(op.procedure) ? "RCT" : /Extraction|Odontectomy/.test(op.procedure) ? "Extracted" : "Treated", notes: op.procedure };
+    });
+    const updatedPt = { ...pt, status: "Ready for Rx Print", dentalChart: chart, visits: [visit, ...(pt.visits || [])] };
+    setPatients(patients.map(p => p.id === pt.id ? updatedPt : p));
+    setPrintModalPt(updatedPt);
+    setMeds([]); setAudio(null); setOp(p => ({ ...p, notes: "", teeth: [] }));
+    setTab(3);
+    say("Saved & sent to Reception for printing!");
+  };
 
-    function App() {
-      // Authentication States
-      const [currentUser, setCurrentUser] = useState(() => {
-        const saved = sessionStorage.getItem("rabia_auth_user");
-        return saved ? JSON.parse(saved) : null;
-      });
-      const [loginInput, setLoginInput] = useState({ username: "", password: "" });
-      const [loginError, setLoginError] = useState("");
+  const addPatient = (e) => {
+    e.preventDefault();
+    const c = {
+      id: "p_" + Date.now(),
+      name: newPt.name,
+      phone: newPt.phone,
+      age: Number(newPt.age) || "",
+      gender: newPt.gender,
+      chartNo: newPt.chartNo || "20261007_" + Math.floor(100000 + Math.random() * 900000),
+      medicalHistory: "None reported",
+      allergies: newPt.allergies.split(",").map(s => s.trim()).filter(Boolean),
+      conditions: [],
+      complaint: newPt.complaint || "Routine evaluation",
+      status: "Waiting in Lobby",
+      dentalChart: {},
+      visits: []
+    };
+    setPatients([c, ...patients]);
+    setSel(c);
+    setNewPt(blankPt);
+    say("Patient record created");
+  };
 
-      // App States
-      const [activeTab, setActiveTab] = useState(1);
-      const [patients, setPatients] = useState(() => {
-        const local = localStorage.getItem("rabia_patients");
-        return local ? JSON.parse(local) : INITIAL_PATIENTS;
-      });
-      const [reminders, setReminders] = useState(() => {
-        const local = localStorage.getItem("rabia_reminders");
-        return local ? JSON.parse(local) : INITIAL_REMINDERS;
-      });
-      const [webhookUrl, setWebhookUrl] = useState(() => {
-        return localStorage.getItem("rabia_sms_webhook") || "";
-      });
-      const [toast, setToast] = useState(null);
+  const addAppt = (e) => {
+    e.preventDefault();
+    setAppts([{ id: "apt-" + Date.now(), ...newApt, status: "Confirmed" }, ...appts]);
+    setNewApt(blankApt);
+    say("Appointment confirmed");
+  };
 
-      // Search & Forms
-      const [searchQuery, setSearchQuery] = useState("");
-      const [selectedPatient, setSelectedPatient] = useState(null);
-      const [newPatient, setNewPatient] = useState({ name: "", phone: "", age: "", gender: "Male", medicalHistory: "", complaint: "" });
-      const [postOpData, setPostOpData] = useState({
-        patientId: "",
-        procedure: "Single-Sitting RCT",
-        tooth: "",
-        notes: "",
-        prescription: "",
-        customGuidelines: POST_OP_PRESETS["Single-Sitting RCT"]
-      });
+  const admit = (a) => {
+    const c = {
+      id: "p_" + Date.now(),
+      name: a.name,
+      phone: a.phone,
+      age: 30,
+      gender: "Female",
+      chartNo: "20261007_" + Math.floor(100000 + Math.random() * 900000),
+      medicalHistory: "None reported",
+      allergies: [],
+      conditions: [],
+      complaint: a.complaint || "Scheduled consultation",
+      status: "Waiting in Lobby",
+      dentalChart: {},
+      visits: []
+    };
+    setPatients([c, ...patients]);
+    setAppts(appts.map(x => x.id === a.id ? { ...x, status: "Arrived / In Clinic" } : x));
+    setSel(c);
+    setTab(3);
+  };
 
-      useEffect(() => {
-        localStorage.setItem("rabia_patients", JSON.stringify(patients));
-      }, [patients]);
+  const wa = (phone, text) => {
+    const p = phone.replace(/\D/g, "");
+    window.open(`https://wa.me/${p.length === 10 ? "91" + p : p}?text=${encodeURIComponent(text)}`, "_blank");
+  };
+  const sms = (phone, text, id) => {
+    if (id) setReminders(reminders.map(r => r.id === id ? { ...r, status: "Sent", timing: "Sent just now" } : r));
+    window.location.href = `sms:${phone}?body=${encodeURIComponent(text)}`;
+  };
+  const aftercareMsg = (name, procedure, tooth, dept) =>
+    `*Dr. Rabia's Dental Care, Tindivanam*\n\nHello ${name},\nஉங்கள் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை — ${procedure} (Tooth #${tooth}):\n\n${tamilFor(dept)}\n\nஅவசர உதவி / Emergency: ${PHONE}`;
 
-      useEffect(() => {
-        localStorage.setItem("rabia_reminders", JSON.stringify(reminders));
-      }, [reminders]);
+  const term = dq.trim().toLowerCase();
+  const searchResults = term.length < 2 ? [] : allDrugs.filter(d => (d.brandName + " " + d.genericSalt).toLowerCase().includes(term)).slice(0, 16);
 
-      useEffect(() => {
-        localStorage.setItem("rabia_sms_webhook", webhookUrl);
-      }, [webhookUrl]);
+  if (!user) return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <form onSubmit={doLogin} className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 space-y-4">
+        <div className="text-center">
+          <div className="inline-flex w-14 h-14 bg-teal-600 text-white rounded-2xl items-center justify-center text-2xl mb-2 font-bold shadow-md">🦷</div>
+          <h1 className="text-xl font-bold">Dr. Rabia's Dental Care</h1>
+          <p className="text-xs text-slate-500">Authorized staff only · confidential patient data</p>
+        </div>
+        {loginError && <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">{loginError}</div>}
+        <Field label="Staff User ID" required value={login.username} onChange={e => setLogin({ ...login, username: e.target.value })} />
+        <Field label="Password" type="password" required value={login.password} onChange={e => setLogin({ ...login, password: e.target.value })} />
+        <button className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition">Unlock clinic portal</button>
+      </form>
+    </div>
+  );
 
-      useEffect(() => {
-        if (window.lucide) window.lucide.createIcons();
-      });
+  const fp = patients.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.phone.includes(q) || (p.chartNo || "").includes(q));
+  const chairPt = patients.find(p => p.id === op.patientId) || patients[0];
+  const modalPt = printModalPt || chairPt;
+  const lvModal = modalPt?.visits?.[0];
 
-      const showToast = (msg, type = "success") => {
-        setToast({ msg, type });
-        setTimeout(() => setToast(null), 4000);
-      };
+  const alerts = (p) => p && (p.allergies?.length > 0 || p.conditions?.length > 0) && (
+    <div className="bg-rose-50 border-l-4 border-rose-600 p-2.5 rounded-r-lg">
+      <p className="text-[11px] font-bold text-rose-800">⚠️ Clinical risk alert — {p.name}</p>
+      <div className="flex flex-wrap gap-1 mt-1">
+        {p.allergies?.map(a => <span key={a} className="bg-rose-200 text-rose-900 text-[10px] font-bold px-1.5 py-0.5 rounded">Allergy: {a}</span>)}
+        {p.conditions?.map(c => <span key={c} className="bg-amber-200 text-amber-900 text-[10px] font-semibold px-1.5 py-0.5 rounded">{c}</span>)}
+      </div>
+    </div>
+  );
 
-      // Handle Authentication
-      const handleLogin = (e) => {
-        e.preventDefault();
-        setLoginError("");
-        const matched = CLINIC_CREDENTIALS.find(
-          c => c.user.toLowerCase() === loginInput.username.trim().toLowerCase() && c.pass === loginInput.password
-        );
+  const rxList = (v) => (v && v.medicines) ? v.medicines.map((m, i) => (
+    <p key={i} className="text-[10px] font-mono text-teal-900">• {m.brandName} [ {doseStr(m, " - ")} ] {m.timing} × {m.days}d</p>
+  )) : null;
 
-        if (matched) {
-          const authData = { user: matched.user, role: matched.role, name: matched.name };
-          setCurrentUser(authData);
-          sessionStorage.setItem("rabia_auth_user", JSON.stringify(authData));
-          showToast(`Welcome back, ${matched.name}`);
-        } else {
-          setLoginError("Invalid username or password. Check clinic credentials.");
-        }
-      };
+  const TABS = [
+    [1, "Overview", "📊"],
+    [2, "Appointments", "📅", appts.filter(a => a.status === "Confirmed").length],
+    [3, "Patients & EHR", "👥", patients.filter(p => p.status === "Ready for Rx Print").length],
+    [4, "Doctor Operatory (Logs)", "🩺"],
+    [5, "Reminders", "🔔", reminders.filter(r => r.status === "Pending").length],
+    [6, "Google Reviews", "⭐"]
+  ];
 
-      const handleLogout = () => {
-        sessionStorage.removeItem("rabia_auth_user");
-        setCurrentUser(null);
-        setLoginInput({ username: "", password: "" });
-      };
-
-      // Add New Patient
-      const handleAddPatient = (e) => {
-        e.preventDefault();
-        if (!newPatient.name || !newPatient.phone) {
-          showToast("Name and Phone are required", "error");
-          return;
-        }
-        const created = {
-          id: "p_" + Date.now(),
-          ...newPatient,
-          visits: []
-        };
-        setPatients([created, ...patients]);
-        setNewPatient({ name: "", phone: "", age: "", gender: "Male", medicalHistory: "", complaint: "" });
-        showToast("Patient record secured successfully!");
-      };
-
-      // Handle Post-Op Log Submission
-      const handleLogPostOp = (e) => {
-        e.preventDefault();
-        const patient = patients.find(p => p.id === postOpData.patientId);
-        if (!patient) {
-          showToast("Please select a patient", "error");
-          return;
-        }
-
-        const newVisit = {
-          date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-          procedure: postOpData.procedure,
-          tooth: postOpData.tooth || "N/A",
-          notes: postOpData.notes || "Procedure completed successfully.",
-          prescription: postOpData.prescription || "Standard analgesics prescribed."
-        };
-
-        const updatedPatients = patients.map(p => {
-          if (p.id === patient.id) {
-            return { ...p, visits: [newVisit, ...p.visits] };
-          }
-          return p;
-        });
-
-        const newReminder = {
-          id: "rem_" + Date.now(),
-          patientName: patient.name,
-          phone: patient.phone,
-          type: "Post-Op Follow-up (Auto-Queued)",
-          timing: "Scheduled +6h",
-          status: "Pending",
-          message: `Dr. Rabia's Dental Care: Hello ${patient.name}, Dr. Rabia hopes you are recovering comfortably from your ${postOpData.procedure}. Notes: ${postOpData.customGuidelines}`
-        };
-
-        setPatients(updatedPatients);
-        setReminders([newReminder, ...reminders]);
-        showToast("Treatment and Post-Op instructions logged!");
-      };
-
-      // WhatsApp Trigger
-      const sendWhatsApp = (phone, text) => {
-        const cleanPhone = phone.replace(/[^0-9]/g, '');
-        const target = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
-        window.open(`https://wa.me/${target}?text=${encodeURIComponent(text)}`, '_blank');
-      };
-
-      // Native Device SMS Protocol
-      const sendNativeSMS = (phone, text, remId) => {
-        if (remId) {
-          const updated = reminders.map(r => r.id === remId ? { ...r, status: "Sent", timing: "Sent just now" } : r);
-          setReminders(updated);
-        }
-        showToast(`Opening mobile SMS app for ${phone}...`);
-        window.location.href = `sms:${phone}?body=${encodeURIComponent(text)}`;
-      };
-
-      // --- RENDER LOGIN GATEWAY IF NOT LOGGED IN ---
-      if (!currentUser) {
-        return (
-          <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 sm:p-8 border border-slate-100">
-              
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 bg-teal-600 text-white rounded-2xl shadow-md mb-3">
-                  <i data-lucide="shield-check" className="w-8 h-8"></i>
-                </div>
-                <h1 className="text-xl font-bold text-slate-900">Dr. Rabia's Dental Care</h1>
-                <p className="text-xs text-slate-500 font-medium mt-1">Authorized Staff & Clinical Access Only</p>
-                <div className="inline-block mt-2 px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-[11px] font-semibold">
-                  🔒 Confidential Patient Data
-                </div>
+  return (
+    <div>
+      <div className="app-chrome min-h-screen flex flex-col bg-[#f8fafc] text-slate-800">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-teal-600 text-white p-2 rounded-xl text-lg font-bold">🦷</div>
+              <div>
+                <h1 className="font-bold text-lg leading-tight text-slate-900">Dr. Rabia's Dental Care</h1>
+                <p className="text-xs text-slate-500 font-medium">Tindivanam Clinic Portal & EzDent Bridge</p>
               </div>
-
-              {loginError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
-                  <i data-lucide="alert-circle" className="w-4 h-4 shrink-0"></i>
-                  <span>{loginError}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Staff User ID</label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      required
-                      value={loginInput.username}
-                      onChange={e => setLoginInput({ ...loginInput, username: e.target.value })}
-                      placeholder="e.g. admin or staff"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <i data-lucide="user" className="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
-                  <div className="relative">
-                    <input 
-                      type="password" 
-                      required
-                      value={loginInput.password}
-                      onChange={e => setLoginInput({ ...loginInput, password: e.target.value })}
-                      placeholder="••••••••••••"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <i data-lucide="lock" className="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
-                  </div>
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md hover:shadow-lg transition flex items-center justify-center gap-2"
-                >
-                  <i data-lucide="log-in" className="w-4 h-4"></i>
-                  Unlock Clinic Portal
-                </button>
-              </form>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 text-center">
-                <p className="text-[11px] text-slate-400">
-                  Default: <strong className="text-slate-600">admin</strong> / <strong className="text-slate-600">drrabia@2026</strong>
-                </p>
-                <p className="text-[10px] text-slate-400 mt-1">
-                  Powered by <strong>Nexus Digital Hub</strong> (+91 9363403175)
-                </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-bold text-slate-900">{user.name}</p>
+                <p className="text-[10px] text-teal-700 font-semibold">{user.role}</p>
               </div>
-
+              <button onClick={logout} className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-1.5 rounded-lg border border-rose-200 transition">Sign out</button>
             </div>
           </div>
-        );
-      }
+          <div className="max-w-6xl mx-auto px-4 flex gap-1 sm:gap-4 overflow-x-auto text-sm font-semibold border-t border-slate-100 no-scrollbar">
+            {TABS.map(([id, label, ic, badge]) => (
+              <button key={id} onClick={() => setTab(id)} className={`py-3 px-3 border-b-2 flex items-center gap-2 whitespace-nowrap transition ${tab === id ? "border-teal-600 text-teal-700 bg-teal-50/50" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
+                <span>{ic}</span>{label}{badge > 0 && <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{badge}</span>}
+              </button>
+            ))}
+          </div>
+        </header>
 
-      // --- MAIN APPLICATION INTERFACE (WHEN AUTHENTICATED) ---
-      const filteredPatients = patients.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        p.phone.includes(searchQuery)
-      );
+        {toast && <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg text-sm">✓ {toast.msg}</div>}
 
-      return (
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
-          
-          {/* Top Bar */}
-          <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-            <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-teal-600 text-white p-2 rounded-xl shadow-sm">
-                  <i data-lucide="cross" className="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h1 className="font-bold text-lg leading-tight text-slate-900">Dr. Rabia's Dental Care</h1>
-                  <p className="text-xs text-slate-500 font-medium">Tindivanam Clinic Portal</p>
-                </div>
+        <main className="max-w-5xl mx-auto w-full p-4 sm:p-6 flex-1">
+
+          {/* TAB 1: OVERVIEW */}
+          {tab === 1 && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  ["Total patients", patients.length, "text-slate-900"],
+                  ["Appointments", appts.length, "text-teal-700"],
+                  ["Ready to print", patients.filter(p => p.status === "Ready for Rx Print").length, "text-amber-600"],
+                  ["Google rating", "4.9 ★", "text-slate-900"]
+                ].map(([l, v, c]) => (
+                  <div key={l} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p className="text-xs text-slate-500 font-semibold uppercase">{l}</p>
+                    <p className={`text-2xl font-bold mt-1 ${c}`}>{v}</p>
+                  </div>
+                ))}
               </div>
-
-              <div className="flex items-center gap-2">
-                <div className="text-right hidden sm:block">
-                  <p className="text-xs font-bold text-slate-900">{currentUser.name}</p>
-                  <p className="text-[10px] text-teal-700 font-semibold">{currentUser.role}</p>
-                </div>
-                <button 
-                  onClick={handleLogout}
-                  title="Secure Logout"
-                  className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-1.5 rounded-lg border border-rose-200 flex items-center gap-1.5 transition"
-                >
-                  <i data-lucide="log-out" className="w-3.5 h-3.5"></i>
-                  <span>Sign Out</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="max-w-6xl mx-auto px-4 flex gap-1 sm:gap-4 overflow-x-auto text-sm font-semibold border-t border-slate-100">
-              {[
-                { id: 1, label: "Overview", icon: "layout-dashboard" },
-                { id: 2, label: "Patients", icon: "users" },
-                { id: 3, label: "Post-Op & Logs", icon: "clipboard-plus" },
-                { id: 4, label: "Reminders & Alerts", icon: "bell", badge: reminders.filter(r => r.status === 'Pending').length },
-                { id: 5, label: "Google Reviews", icon: "star" }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-3 px-3 border-b-2 flex items-center gap-2 whitespace-nowrap transition ${
-                    activeTab === tab.id 
-                      ? 'border-teal-600 text-teal-700 bg-teal-50/50' 
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <i data-lucide={tab.icon} className="w-4 h-4"></i>
-                  <span>{tab.label}</span>
-                  {tab.badge > 0 && (
-                    <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </header>
-
-          {/* Toast Notification */}
-          {toast && (
-            <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 border border-slate-700 text-sm">
-              <i data-lucide="check-circle" className="w-5 h-5 text-teal-400"></i>
-              <span>{toast.msg}</span>
-            </div>
-          )}
-
-          {/* Main Content Area */}
-          <main className="max-w-6xl mx-auto w-full p-4 sm:p-6 flex-1">
-            
-            {/* TAB 1: OVERVIEW */}
-            {activeTab === 1 && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-xs text-slate-500 font-semibold uppercase">Total Patients</p>
-                    <p className="text-2xl font-bold text-slate-900 mt-1">{patients.length}</p>
-                    <span className="text-[11px] text-teal-600 font-medium">In Tindivanam database</span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-xs text-slate-500 font-semibold uppercase">Pending Alerts</p>
-                    <p className="text-2xl font-bold text-amber-600 mt-1">
-                      {reminders.filter(r => r.status === 'Pending').length}
-                    </p>
-                    <span className="text-[11px] text-amber-700 font-medium">Require dispatch</span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-xs text-slate-500 font-semibold uppercase">Post-Op Logged</p>
-                    <p className="text-2xl font-bold text-teal-700 mt-1">
-                      {patients.reduce((acc, p) => acc + p.visits.length, 0)}
-                    </p>
-                    <span className="text-[11px] text-teal-600 font-medium">Total procedures</span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-xs text-slate-500 font-semibold uppercase">Google Maps Rating</p>
-                    <p className="text-2xl font-bold text-slate-900 mt-1">4.9 ★</p>
-                    <span className="text-[11px] text-emerald-600 font-medium">Tindivanam Clinic</span>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-                  <h3 className="text-base font-bold text-slate-900 mb-3 flex items-center justify-between">
-                    <span>Recent Post-Op Treatments</span>
-                    <button onClick={() => setActiveTab(3)} className="text-xs text-teal-700 hover:underline">Log New Procedure →</button>
-                  </h3>
-                  <div className="divide-y divide-slate-100">
-                    {patients.flatMap(p => p.visits.map(v => ({ ...v, patientName: p.name, patientPhone: p.phone }))).slice(0, 4).map((visit, idx) => (
-                      <div key={idx} className="py-3 flex items-center justify-between text-sm">
-                        <div>
-                          <p className="font-semibold text-slate-900">{visit.patientName} — <span className="text-teal-700">{visit.procedure}</span></p>
-                          <p className="text-xs text-slate-500">Tooth: #{visit.tooth} | Date: {visit.date}</p>
-                        </div>
-                        <button 
-                          onClick={() => sendWhatsApp(visit.patientPhone, `Dr. Rabia's Dental Care: Hello ${visit.patientName}, here are your post-care instructions from Dr. Rabia:\n\n${visit.notes}\n\nPrescription: ${visit.prescription}`)}
-                          className="px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
-                        >
-                          <i data-lucide="message-square" className="w-3.5 h-3.5"></i>
-                          Send Post-Op (WhatsApp)
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: PATIENTS DIRECTORY */}
-            {activeTab === 2 && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-4">
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      placeholder="Search patient by name or phone..." 
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    />
-                    <i data-lucide="search" className="w-4 h-4 text-slate-400 absolute left-3 top-3.5"></i>
-                  </div>
-
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm divide-y divide-slate-100 overflow-hidden">
-                    {filteredPatients.map(pt => (
-                      <div 
-                        key={pt.id} 
-                        onClick={() => setSelectedPatient(pt)}
-                        className={`p-4 hover:bg-slate-50 cursor-pointer transition flex items-center justify-between ${selectedPatient?.id === pt.id ? 'bg-teal-50/70 border-l-4 border-teal-600' : ''}`}
-                      >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900">{pt.name}</span>
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">{pt.gender}, {pt.age}y</span>
-                          </div>
-                          <p className="text-xs text-slate-500 mt-1">📞 {pt.phone} | History: {pt.medicalHistory || "None"}</p>
-                          <p className="text-xs text-teal-700 font-medium mt-0.5">Visits logged: {pt.visits.length}</p>
-                        </div>
-                        <i data-lucide="chevron-right" className="w-5 h-5 text-slate-400"></i>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  {selectedPatient ? (
-                    <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                      <div className="flex items-center justify-between border-b pb-3">
-                        <h3 className="font-bold text-slate-900">Patient File</h3>
-                        <button onClick={() => setSelectedPatient(null)} className="text-xs text-slate-500 hover:text-slate-800">Close ✕</button>
-                      </div>
+              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                <h3 className="text-base font-bold mb-3 flex justify-between items-center">
+                  <span>Recent Treatments</span>
+                  <button onClick={() => setTab(4)} className="text-xs text-teal-700 font-semibold hover:underline">Open operatory →</button>
+                </h3>
+                <div className="divide-y divide-slate-100">
+                  {patients.flatMap(p => (p.visits || []).map(v => ({ v, p }))).slice(0, 4).map(({ v, p }, i) => (
+                    <div key={i} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
                       <div>
-                        <p className="text-lg font-bold text-slate-900">{selectedPatient.name}</p>
-                        <p className="text-xs text-slate-500">Phone: {selectedPatient.phone} | Age: {selectedPatient.age}</p>
-                        <p className="text-xs text-slate-600 mt-2 font-medium">Chief Complaint: <span className="text-slate-800">{selectedPatient.complaint}</span></p>
+                        <p className="font-semibold">{p.name} — <span className="text-teal-700">{v.procedure}</span></p>
+                        <p className="text-xs text-slate-500">Tooth #{v.tooth} · Chart {p.chartNo}</p>
+                        {rxList(v)}
                       </div>
-
-                      <div className="border-t pt-3">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Visit History</h4>
-                        <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
-                          {selectedPatient.visits.length === 0 ? (
-                            <p className="text-xs text-slate-400 italic">No past visits recorded.</p>
-                          ) : (
-                            selectedPatient.visits.map((v, i) => (
-                              <div key={i} className="text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-200 space-y-1">
-                                <div className="flex justify-between font-semibold text-slate-800">
-                                  <span>{v.procedure} (Tooth #{v.tooth})</span>
-                                  <span className="text-slate-400">{v.date}</span>
-                                </div>
-                                <p className="text-slate-600">{v.notes}</p>
-                                <p className="text-teal-700 font-medium">Rx: {v.prescription}</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleAddPatient} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                      <h3 className="font-bold text-slate-900 text-sm border-b pb-2 flex items-center gap-2">
-                        <i data-lucide="user-plus" className="w-4 h-4 text-teal-600"></i>
-                        Register New Patient
-                      </h3>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600">Patient Full Name</label>
-                        <input 
-                          type="text" 
-                          required
-                          value={newPatient.name} 
-                          onChange={e => setNewPatient({ ...newPatient, name: e.target.value })}
-                          className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
-                          placeholder="e.g. Ramesh V"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="text-xs font-semibold text-slate-600">Phone (10 digits)</label>
-                          <input 
-                            type="tel" 
-                            required
-                            value={newPatient.phone} 
-                            onChange={e => setNewPatient({ ...newPatient, phone: e.target.value })}
-                            className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
-                            placeholder="9363403175"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-semibold text-slate-600">Age</label>
-                          <input 
-                            type="number" 
-                            value={newPatient.age} 
-                            onChange={e => setNewPatient({ ...newPatient, age: e.target.value })}
-                            className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
-                            placeholder="32"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600">Medical Notes / Allergies</label>
-                        <input 
-                          type="text" 
-                          value={newPatient.medicalHistory} 
-                          onChange={e => setNewPatient({ ...newPatient, medicalHistory: e.target.value })}
-                          className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500" 
-                          placeholder="e.g. Penicillin allergy, Diabetic"
-                        />
-                      </div>
-                      <button 
-                        type="submit" 
-                        className="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition shadow-sm"
-                      >
-                        + Save Patient Record
-                      </button>
-                    </form>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: POST-OP CARE */}
-            {activeTab === 3 && (
-              <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="clipboard-check" className="w-5 h-5 text-teal-600"></i>
-                    Post-Operative Treatment Log
-                  </h3>
-                  <p className="text-xs text-slate-500">Log procedures and instantly dispatch standardized post-care guidelines to the patient's phone.</p>
-                </div>
-
-                <form onSubmit={handleLogPostOp} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-slate-700">Select Patient</label>
-                      <select 
-                        required
-                        value={postOpData.patientId} 
-                        onChange={e => setPostOpData({ ...postOpData, patientId: e.target.value })}
-                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 bg-white"
-                      >
-                        <option value="">-- Choose Patient --</option>
-                        {patients.map(p => (
-                          <option key={p.id} value={p.id}>{p.name} ({p.phone})</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-semibold text-slate-700">Procedure Performed</label>
-                      <select 
-                        value={postOpData.procedure} 
-                        onChange={e => {
-                          const proc = e.target.value;
-                          setPostOpData({ 
-                            ...postOpData, 
-                            procedure: proc, 
-                            customGuidelines: POST_OP_PRESETS[proc] || "" 
-                          });
-                        }}
-                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 bg-white"
-                      >
-                        {Object.keys(POST_OP_PRESETS).map(proc => (
-                          <option key={proc} value={proc}>{proc}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-slate-700">Treated Tooth #(s)</label>
-                      <input 
-                        type="text" 
-                        value={postOpData.tooth} 
-                        onChange={e => setPostOpData({ ...postOpData, tooth: e.target.value })}
-                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs" 
-                        placeholder="e.g. 46, 47"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="text-xs font-semibold text-slate-700">Prescription / Medications</label>
-                      <input 
-                        type="text" 
-                        value={postOpData.prescription} 
-                        onChange={e => setPostOpData({ ...postOpData, prescription: e.target.value })}
-                        className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs" 
-                        placeholder="e.g. Tab Zerodol-SP 1 BD x 3 days"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-700">Automated Post-Op Care Guidelines</label>
-                    <textarea 
-                      rows="4" 
-                      value={postOpData.customGuidelines} 
-                      onChange={e => setPostOpData({ ...postOpData, customGuidelines: e.target.value })}
-                      className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs text-slate-700 font-mono focus:ring-2 focus:ring-teal-500"
-                    ></textarea>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button 
-                      type="submit" 
-                      className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
-                    >
-                      Save Treatment & Queue Post-Op Alert
-                    </button>
-                    {postOpData.patientId && (
-                      <button 
-                        type="button"
-                        onClick={() => {
-                          const patient = patients.find(p => p.id === postOpData.patientId);
-                          if (patient) {
-                            sendWhatsApp(patient.phone, `Dr. Rabia's Dental Care - Post-Op Instructions:\n\nCare notes for ${postOpData.procedure}:\n${postOpData.customGuidelines}\n\nPrescription: ${postOpData.prescription || 'As advised'}`);
-                          }
-                        }}
-                        className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition"
-                      >
-                        <i data-lucide="send" className="w-4 h-4"></i>
-                        Send via WhatsApp
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* TAB 4: REMINDERS & ALERTS QUEUE */}
-            {activeTab === 4 && (
-              <div className="space-y-4">
-                
-                {/* Cloud SMS Gateway Hook Config (Optional) */}
-                <div className="bg-slate-100 p-3 rounded-xl border border-slate-200 text-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <i data-lucide="settings" className="w-4 h-4 text-slate-500"></i>
-                    <span className="text-slate-700 font-semibold">Automated SMS Gateway (Optional):</span>
-                  </div>
-                  <input 
-                    type="text" 
-                    placeholder="Paste Make.com Webhook URL (Leave empty for Native Mobile SMS)" 
-                    value={webhookUrl}
-                    onChange={e => setWebhookUrl(e.target.value)}
-                    className="flex-1 max-w-md p-1.5 px-3 rounded-lg border border-slate-300 text-xs bg-white focus:ring-1 focus:ring-teal-500"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between pt-2">
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900">Automated Reminders & Alerts Queue</h3>
-                    <p className="text-xs text-slate-500">Scheduled alarms for upcoming appointments, next sittings, and routine checkups.</p>
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    Pending: <span className="font-bold text-amber-600">{reminders.filter(r => r.status === 'Pending').length}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {reminders.map(rem => (
-                    <div 
-                      key={rem.id} 
-                      className={`p-4 rounded-xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                        rem.status === 'Pending' ? 'bg-white border-amber-200 shadow-sm' : 'bg-slate-50 border-slate-200'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 text-sm">{rem.patientName}</span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            rem.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
-                          }`}>
-                            {rem.status}
-                          </span>
-                        </div>
-                        <p className="text-xs font-medium text-teal-700 mt-0.5">{rem.type}</p>
-                        <p className="text-xs text-slate-600 mt-1 max-w-xl">"{rem.message}"</p>
-                        <p className="text-[11px] text-slate-400 mt-1">Scheduled for: {rem.timing} • 📞 {rem.phone}</p>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2 shrink-0">
-                        {/* Direct Native SMS button */}
-                        <button 
-                          onClick={() => sendNativeSMS(rem.phone, rem.message, rem.id)}
-                          title="Opens native device SMS app immediately"
-                          className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
-                        >
-                          <i data-lucide="smartphone" className="w-3.5 h-3.5"></i>
-                          Direct SMS (Mobile)
-                        </button>
-
-                        {/* WhatsApp button */}
-                        <button 
-                          onClick={() => sendWhatsApp(rem.phone, rem.message)}
-                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
-                        >
-                          <i data-lucide="share-2" className="w-3.5 h-3.5"></i>
-                          WhatsApp
-                        </button>
+                      <div className="flex gap-2">
+                        <button onClick={() => setPrintModalPt(p)} className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold transition">🔍 Preview & Print Rx</button>
+                        <button onClick={() => wa(p.phone, aftercareMsg(p.name, v.procedure, v.tooth, v.department))} className="px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition">WhatsApp</button>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* TAB 5: GOOGLE REVIEW BOOSTER */}
-            {activeTab === 5 && (
-              <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="star" className="w-5 h-5 text-amber-500"></i>
-                    Google Maps Review Growth Engine
-                  </h3>
-                  <p className="text-xs text-slate-500">Directly addresses Dr. Rabia's low review count in Tindivanam by prompting satisfied patients immediately after procedures.</p>
-                </div>
-
-                <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-2">
-                  <p className="font-bold flex items-center gap-1.5">
-                    <i data-lucide="map-pin" className="w-4 h-4 text-amber-600"></i>
-                    Verified Tindivanam Clinic Review Link:
-                  </p>
-                  <p className="font-mono text-[11px] bg-white p-2 rounded border border-amber-200 select-all overflow-x-auto">
-                    {DR_RABIA_MAPS_URL}
-                  </p>
-                  <p className="italic text-[11px] mt-1 text-slate-600">When clicked, this opens Dr. Rabia's official Google Maps listing without 404 connection errors.</p>
-                </div>
-
-                <div className="divide-y divide-slate-100">
-                  <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Patients Ready for 5-Star Invite</p>
-                  {patients.map(p => {
-                    const reviewText = `Hello ${p.name}, thank you for choosing Dr. Rabia's Dental Care in Tindivanam. If you had a gentle experience with Dr. Rabia, please take 10 seconds to share your review on Google: ${DR_RABIA_MAPS_URL}`;
-                    return (
-                      <div key={p.id} className="py-3 flex items-center justify-between text-xs">
-                        <div>
-                          <p className="font-bold text-slate-900">{p.name}</p>
-                          <p className="text-slate-500">📞 {p.phone}</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button 
-                            onClick={() => sendNativeSMS(p.phone, reviewText)}
-                            className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold flex items-center gap-1 transition"
-                          >
-                            <i data-lucide="smartphone" className="w-3.5 h-3.5"></i>
-                            SMS Invite
-                          </button>
-                          <button 
-                            onClick={() => sendWhatsApp(p.phone, reviewText)}
-                            className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold flex items-center gap-1 transition"
-                          >
-                            <i data-lucide="send" className="w-3.5 h-3.5"></i>
-                            WhatsApp
-                          </button>
-                        </div>
+          {/* TAB 2: APPOINTMENTS */}
+          {tab === 2 && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden self-start shadow-sm">
+                {appts.map(a => (
+                  <div key={a.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-sm text-slate-900">{a.name}</span>
+                        <span className="text-[10px] bg-teal-50 text-teal-800 font-semibold px-2 py-0.5 rounded border border-teal-200">{a.time}</span>
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{a.date}</span>
                       </div>
-                    );
-                  })}
+                      <p className="text-xs text-slate-500 mt-1">📞 {a.phone} · {a.doctor}</p>
+                      <p className="text-xs text-slate-600">Complaint: {a.complaint || "General checkup"}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {a.status !== "Arrived / In Clinic" ? (
+                        <button onClick={() => admit(a)} className="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Admit to queue</button>
+                      ) : (
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200">✓ Admitted</span>
+                      )}
+                      <button onClick={() => wa(a.phone, `Hello ${a.name}, your dental appointment with ${a.doctor} at Dr. Rabia's Dental Care Tindivanam is on ${a.date} at ${a.time}. Location: ${MAPS}`)} className="px-3 py-2 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg text-xs font-bold transition">Notify</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <form onSubmit={addAppt} className="bg-white p-5 rounded-xl border border-slate-200 space-y-3 self-start shadow-sm">
+                <h3 className="font-bold text-sm border-b pb-2">Book New Appointment</h3>
+                <Field label="Patient name" required value={newApt.name} onChange={e => setNewApt({ ...newApt, name: e.target.value })} />
+                <div className="grid grid-cols-2 gap-2">
+                  <Field label="Phone (10 digits)" type="tel" required value={newApt.phone} onChange={e => setNewApt({ ...newApt, phone: e.target.value })} />
+                  <Field label="Time" required value={newApt.time} onChange={e => setNewApt({ ...newApt, time: e.target.value })} />
+                </div>
+                <Field label="Date" type="date" required value={newApt.date} onChange={e => setNewApt({ ...newApt, date: e.target.value })} />
+                <Field label="Chief concern" value={newApt.complaint} onChange={e => setNewApt({ ...newApt, complaint: e.target.value })} />
+                <button className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Confirm booking</button>
+              </form>
+            </div>
+          )}
+
+          {/* TAB 3: PATIENTS & EHR */}
+          {tab === 3 && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-4">
+                <input placeholder="Search name, phone or EzDent chart no…" value={q} onChange={e => setQ(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none shadow-sm" />
+                <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden shadow-sm">
+                  {fp.map(pt => (
+                    <div key={pt.id} onClick={() => setSel(pt)} className={`p-4 hover:bg-slate-50 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${sel?.id === pt.id ? "bg-teal-50/70 border-l-4 border-teal-600" : ""}`}>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold">{pt.name}</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold">{pt.gender}, {pt.age}y</span>
+                          <span className="text-[10px] font-mono bg-teal-50 text-teal-800 border border-teal-200 px-1.5 py-0.5 rounded">{pt.chartNo}</span>
+                          {pt.status === "Ready for Rx Print" && <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full animate-pulse">Ready to print Rx</span>}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">📞 {pt.phone} · {pt.medicalHistory}</p>
+                      </div>
+                      {pt.visits && pt.visits.length > 0 && (
+                        <button onClick={(e) => { e.stopPropagation(); setPrintModalPt(pt); }} className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shrink-0 shadow-sm transition">🔍 Preview & Print</button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
 
-          </main>
+              <div className="self-start">
+                {sel ? (
+                  <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-4 shadow-sm">
+                    <div className="flex justify-between border-b pb-3">
+                      <h3 className="font-bold text-slate-900">EHR Patient Chart</h3>
+                      <button onClick={() => setSel(null)} className="text-xs text-slate-500 hover:text-slate-800">Close ✕</button>
+                    </div>
+                    {alerts(sel)}
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">{sel.name}</p>
+                      <p className="text-xs text-slate-500">{sel.phone} · {sel.age}y · {sel.gender}</p>
+                      <p className="text-xs font-mono text-teal-800">Chart: {sel.chartNo}</p>
+                    </div>
+                    <Odontogram selected={[]} onToggle={() => {}} chart={sel.dentalChart} />
+                    <div className="flex gap-2">
+                      {sel.visits && sel.visits.length > 0 && (
+                        <button onClick={() => setPrintModalPt(sel)} className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition">🔍 Preview & Print</button>
+                      )}
+                      <button onClick={() => { setOp(p => ({ ...p, patientId: sel.id })); setTab(4); }} className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Log Treatment</button>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={addPatient} className="bg-white p-5 rounded-xl border border-slate-200 space-y-3 shadow-sm">
+                    <h3 className="font-bold text-sm border-b pb-2">Register Walk-in Patient</h3>
+                    <Field label="Full name" required value={newPt.name} onChange={e => setNewPt({ ...newPt, name: e.target.value })} />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Field label="Phone" type="tel" required value={newPt.phone} onChange={e => setNewPt({ ...newPt, phone: e.target.value })} />
+                      <Field label="Age" type="number" required value={newPt.age} onChange={e => setNewPt({ ...newPt, age: e.target.value })} placeholder="23" />
+                    </div>
+                    <Field label="EzDent chart no" value={newPt.chartNo} onChange={e => setNewPt({ ...newPt, chartNo: e.target.value })} />
+                    <button className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition">Save patient record</button>
+                  </form>
+                )}
+              </div>
+            </div>
+          )}
 
-          {/* Footer Branding */}
-          <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
-            Clinical System Architected & Powered by <strong className="text-slate-700">Nexus Digital Hub</strong> (+91 9363403175)
-          </footer>
+          {/* TAB 4: DOCTOR OPERATORY WITH DYNAMIC ADD CATEGORY & PROCEDURE */}
+          {tab === 4 && (
+            <form onSubmit={saveTreatment} className="space-y-4">
+              
+              {/* Patient in Chair Selection */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Patient in Chair</span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <select 
+                      value={op.patientId} 
+                      onChange={e => setOp({ ...op, patientId: e.target.value, teeth: [] })}
+                      className="font-bold text-sm text-slate-900 bg-transparent border-b border-dashed border-teal-500 focus:outline-none"
+                    >
+                      {patients.map(p => <option key={p.id} value={p.id}>{p.name} ({p.gender}, {p.age}y)</option>)}
+                    </select>
+                    <span className="font-mono text-xs bg-teal-50 text-teal-800 px-2 py-0.5 rounded border border-teal-200">
+                      Chart: {chairPt.chartNo}
+                    </span>
+                  </div>
+                </div>
+
+                {printModalPt && (
+                  <button 
+                    type="button" 
+                    onClick={() => setPrintModalPt(chairPt)}
+                    className="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-bold shadow transition"
+                  >
+                    Preview Last Rx Slip
+                  </button>
+                )}
+              </div>
+
+              {/* 32-Tooth Odontogram */}
+              <Odontogram selected={op.teeth} onToggle={toggleTooth} chart={chairPt?.dentalChart} />
+
+              {/* ======================================================== */}
+              {/* 1. TOP CARD: Specialty Category & Clinical Procedure */}
+              {/* ======================================================== */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-xs font-bold text-slate-700">
+                        Specialty Category
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddNewCategory}
+                        className="text-[11px] font-bold text-teal-700 hover:text-teal-900 hover:underline"
+                      >
+                        + Add category
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <select
+                        value={op.department}
+                        onChange={e => {
+                          const dept = e.target.value;
+                          setOp({ ...op, department: dept, procedure: (categories[dept] && categories[dept][0]) || "General Consultation" });
+                        }}
+                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm"
+                      >
+                        {Object.keys(categories).map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-xs font-bold text-slate-700">
+                        Clinical Procedure
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddNewProcedure}
+                        className="text-[11px] font-bold text-teal-700 hover:text-teal-900 hover:underline"
+                      >
+                        + Add procedure
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <select
+                        value={op.procedure}
+                        onChange={e => setOp({ ...op, procedure: e.target.value })}
+                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm"
+                      >
+                        {(categories[op.department] || []).map(pr => (
+                          <option key={pr} value={pr}>{pr}</option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ======================================================== */}
+              {/* 2. MIDDLE CARD: Drug Search & One-Tap Palette (94 Formulations) */}
+              {/* ======================================================== */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Drug Search & One–Tap Palette (94 Formulations)
+                  </h3>
+                  <span className="text-xs font-semibold text-teal-600">
+                    Tap adds formulation
+                  </span>
+                </div>
+
+                {/* Input Search & Add Drug Button */}
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={dq}
+                      onChange={e => setDq(e.target.value)}
+                      placeholder="Type 2 letters — au, pan, flag, syp..."
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAdd(true)}
+                    className="px-4 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                  >
+                    + Add clinic drug
+                  </button>
+                </div>
+
+                {/* Dynamic Real-time Search Box */}
+                {term.length >= 2 && (
+                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <p className="text-[11px] font-bold text-slate-500 mb-1.5">Matching Formulations:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {searchResults.map(d => (
+                        <button
+                          type="button"
+                          key={d.brandName}
+                          onClick={() => tapDrug(d)}
+                          className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition active:scale-95 ${
+                            inRx(d.brandName) 
+                              ? "bg-teal-600 text-white border-teal-700" 
+                              : "bg-white text-slate-800 border-slate-300 hover:border-teal-500"
+                          }`}
+                        >
+                          {inRx(d.brandName) ? "✓ " : "+ "}{d.brandName}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Daily Quick-Tap Formulations Pills */}
+                <div>
+                  <p className="text-[11px] font-bold text-slate-600 mb-2">
+                    Daily Quick–Tap Formulations
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {PRESETS.map(b => allDrugs.find(d => d.brandName === b)).filter(Boolean).map(drug => (
+                      <button
+                        key={drug.brandName}
+                        type="button"
+                        onClick={() => tapDrug(drug)}
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-sm transition-all active:scale-95 ${
+                          inRx(drug.brandName)
+                            ? "bg-teal-600 text-white border-teal-700 shadow"
+                            : "bg-white text-slate-800 border-slate-200 hover:border-teal-500"
+                        }`}
+                      >
+                        {inRx(drug.brandName) ? "✓ " : "+ "}{drug.brandName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Expandable Category Drawer */}
+                <div className="border border-slate-200 rounded-xl p-3 bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setShowCatDrawer(!showCatDrawer)}
+                    className="w-full flex justify-between items-center text-xs font-bold text-slate-800 focus:outline-none"
+                  >
+                    <span>Browse all 75+ drugs by category</span>
+                    <svg className={`w-4 h-4 text-slate-500 transition-transform ${showCatDrawer ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </button>
+
+                  {showCatDrawer && (
+                    <div className="space-y-3 mt-3 pt-3 border-t border-slate-100 max-h-60 overflow-y-auto">
+                      {Object.keys(DRUG_GROUPS).map(group => (
+                        <div key={group}>
+                          <p className="text-[11px] font-bold text-slate-600 mb-1">{group}</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {allDrugs.filter(d => d.group === group).map(d => (
+                              <button
+                                type="button"
+                                key={d.brandName}
+                                onClick={() => tapDrug(d)}
+                                className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition ${
+                                  inRx(d.brandName) ? "bg-teal-600 text-white border-teal-700" : "bg-white text-slate-700 border-slate-200 hover:border-teal-500"
+                                }`}
+                              >
+                                {inRx(d.brandName) ? "✓ " : "+ "}{d.brandName}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Modal: Custom Drug */}
+                {showAdd && (
+                  <div className="fixed inset-0 z-40 bg-black/50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl p-5 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto shadow-2xl">
+                      <h4 className="font-bold text-sm">Add Clinic Drug to Stock</h4>
+                      <Field label="Brand name" value={cd.brandName} onChange={e => setCd({ ...cd, brandName: e.target.value })} />
+                      <Field label="Generic composition (printed on slip)" value={cd.genericSalt} onChange={e => setCd({ ...cd, genericSalt: e.target.value })} placeholder="e.g. Tab. Paracetamol 500 mg" />
+                      <div>
+                        <p className="text-xs font-semibold text-slate-600 mb-1">Default timing</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {TIMINGS.map(t => <button type="button" key={t} onClick={() => setCd({ ...cd, timing: t })} className={`min-h-[38px] px-3 rounded-lg border text-xs font-semibold ${cd.timing === t ? "bg-teal-600 text-white" : "bg-white"}`}>{t}</button>)}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-2">
+                        <button type="button" onClick={() => {
+                          const b = cd.brandName.trim(), g = cd.genericSalt.trim();
+                          if (!b || !g) return say("Both brand and generic are required");
+                          setCustom([...custom, { brandName: b, genericSalt: g, m: true, a: false, n: true, timing: cd.timing, days: 3, group: CUSTOM_GROUP }]);
+                          setCd({ brandName: "", genericSalt: "", timing: "After Food" }); setShowAdd(false); say(`${b} saved to stock`);
+                        }} className="flex-1 py-2.5 bg-teal-600 text-white rounded-lg text-xs font-bold">Save to stock</button>
+                        <button type="button" onClick={() => setShowAdd(false)} className="px-4 py-2.5 bg-slate-100 rounded-lg text-xs font-bold">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="border-t border-slate-100 my-2"></div>
+
+                {/* ======================================================== */}
+                {/* 3. BOTTOM SECTION: Prescription (X) */}
+                {/* ======================================================== */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-slate-900">
+                    Prescription ({meds.length})
+                  </h4>
+
+                  {meds.length === 0 ? (
+                    <div className="p-4 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50/50">
+                      <p className="text-xs text-slate-400 italic font-medium">
+                        Nothing prescribed. Tap a drug above.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {meds.map((m, idx) => (
+                        <div key={m.id} className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 text-xs">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <span className="font-bold text-slate-900 text-xs">{idx + 1}. {m.brandName}</span>
+                              <p className="text-[10px] text-slate-500 italic mt-0.5">{composition(m)}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => dropMed(m.id)}
+                              className="text-slate-400 hover:text-rose-600 px-2 py-1 text-sm font-bold"
+                            >
+                              ✕
+                            </button>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60">
+                            <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[10px] font-bold">
+                              <button
+                                type="button"
+                                onClick={() => setMed(m.id, { m: !m.m })}
+                                className={`px-2 py-0.5 rounded transition ${m.m ? "bg-teal-600 text-white" : "text-slate-400"}`}
+                              >M</button>
+                              <button
+                                type="button"
+                                onClick={() => setMed(m.id, { a: !m.a })}
+                                className={`px-2 py-0.5 rounded transition ${m.a ? "bg-teal-600 text-white" : "text-slate-400"}`}
+                              >A</button>
+                              <button
+                                type="button"
+                                onClick={() => setMed(m.id, { n: !m.n })}
+                                className={`px-2 py-0.5 rounded transition ${m.n ? "bg-teal-600 text-white" : "text-slate-400"}`}
+                              >N</button>
+                            </div>
+
+                            <span className="font-mono font-bold text-teal-800 text-[11px]">
+                              ({doseStr(m, " - ")})
+                            </span>
+
+                            <select
+                              value={m.timing}
+                              onChange={(e) => setMed(m.id, { timing: e.target.value })}
+                              className="text-[10px] font-medium border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none"
+                            >
+                              {TIMINGS.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+
+                            <div className="flex items-center gap-1 text-[10px]">
+                              <span>For:</span>
+                              <input
+                                type="number"
+                                min="1"
+                                max="30"
+                                value={m.days}
+                                onChange={(e) => setMed(m.id, { days: Number(e.target.value) })}
+                                className="w-10 border border-slate-200 rounded-lg px-1 py-1 text-center font-bold bg-white"
+                              />
+                              <span>days</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Voice Memo Box */}
+                <div className="border-t pt-3 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">Doctor Voice Audio Memo</p>
+                    <p className="text-[10px] text-slate-500">Record a quick audio message directly for the front desk.</p>
+                  </div>
+                  {!rec ? (
+                    <button type="button" onClick={startRec} className="min-h-[40px] px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
+                      🎙 Record Memo
+                    </button>
+                  ) : (
+                    <button type="button" onClick={stopRec} className="min-h-[40px] px-4 bg-slate-900 text-white rounded-lg text-xs font-bold animate-pulse transition">
+                      ■ Stop & Attach
+                    </button>
+                  )}
+                </div>
+                {audio && <audio controls src={audio} className="w-full h-10 mt-1"></audio>}
+
+              </div>
+
+              {/* Tamil Booklet Summary */}
+              <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                <h4 className="text-xs font-bold text-amber-900 mb-1 ta">பல் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை (Booklet Summary)</h4>
+                <p className="text-xs text-amber-900 whitespace-pre-line leading-relaxed ta">{tamilFor(op.department)}</p>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-700">Operatory Notes (Optional)</label>
+                <input value={op.notes} onChange={e => setOp({ ...op, notes: e.target.value })} className="w-full mt-1 p-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="e.g. Canals prepared to 21mm, temporized with Cavit" />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button className="flex-1 min-h-[48px] bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold shadow transition">
+                  Complete & Send to Reception
+                </button>
+                <button type="button" onClick={() => chairPt && wa(chairPt.phone, aftercareMsg(chairPt.name, op.procedure, op.teeth.join(", ") || "General", op.department))} className="min-h-[48px] px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow transition">
+                  Send Aftercare on WhatsApp
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* TAB 5: REMINDERS */}
+          {tab === 5 && (
+            <div className="space-y-3">
+              {reminders.map(r => (
+                <div key={r.id} className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${r.status === "Pending" ? "bg-white border-amber-200 shadow-sm" : "bg-slate-50 border-slate-200"}`}>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-slate-900">{r.patientName}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.status === "Pending" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>{r.status}</span>
+                    </div>
+                    <p className="text-xs font-medium text-teal-700">{r.type}</p>
+                    <p className="text-xs text-slate-600 mt-1 max-w-xl">"{r.message}"</p>
+                    <p className="text-[11px] text-slate-400 mt-1">{r.timing} · 📞 {r.phone}</p>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button onClick={() => sms(r.phone, r.message, r.id)} className="px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold">SMS</button>
+                    <button onClick={() => wa(r.phone, r.message)} className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold">WhatsApp</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* TAB 6: GOOGLE REVIEWS */}
+          {tab === 6 && (
+            <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl border border-slate-200 space-y-4 shadow-sm">
+              <h3 className="text-base font-bold">⭐ Google Maps Review Requests</h3>
+              <p className="font-mono text-[11px] bg-amber-50 p-2 rounded border border-amber-200 select-all overflow-x-auto text-amber-900">{MAPS}</p>
+              <div className="divide-y divide-slate-100">
+                {patients.map(p => {
+                  const t = `Hello ${p.name}, thank you for choosing Dr. Rabia's Dental Care in Tindivanam. If you had a comfortable visit, please share a quick review on Google: ${MAPS}`;
+                  return (
+                    <div key={p.id} className="py-3 flex items-center justify-between text-xs">
+                      <div>
+                        <p className="font-bold">{p.name}</p>
+                        <p className="text-slate-500">📞 {p.phone}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => sms(p.phone, t)} className="px-3 py-2 bg-slate-800 text-white rounded-lg font-semibold">SMS</button>
+                        <button onClick={() => wa(p.phone, t)} className="px-3 py-2 bg-emerald-600 text-white rounded-lg font-semibold">WhatsApp</button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+        </main>
+
+        <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
+          Powered by <strong className="text-slate-700">Nexus Digital Hub</strong> ({PHONE})
+        </footer>
+      </div>
+
+      {/* PRINT PREVIEW MODAL */}
+      {printModalPt && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col my-auto border border-slate-200">
+            <div className="bg-slate-900 text-white px-5 py-3.5 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🖨️</span>
+                <span className="text-sm font-bold">Official Prescription Slip Preview</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow"
+                >
+                  Send to Printer / Save PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrintModalPt(null)}
+                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition"
+                >
+                  ✕ Close
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[75vh] bg-slate-100">
+              <div className="bg-white p-6 rounded-xl shadow border border-slate-200 text-xs">
+                <div className="border-b-2 border-teal-700 pb-3 mb-3 flex justify-between items-start">
+                  <div>
+                    <h2 className="text-lg font-bold text-teal-800 m-0">Dr. Rabia's Dental Care</h2>
+                    <p className="text-[11px] text-slate-600 mt-0.5">Multi-Speciality Dental Clinic & Implant Centre · Tindivanam</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Ph: {PHONE}</p>
+                  </div>
+                  <div className="text-right text-[10px]">
+                    <p className="text-xs font-bold m-0">Date: {lvModal?.date || "Today"}</p>
+                    <p className="font-mono text-slate-600 mt-0.5">Chart No: {modalPt?.chartNo}</p>
+                    <p className="font-bold text-teal-800 mt-0.5">{lvModal?.department || "Dental Surgery"}</p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-2.5 rounded-lg mb-3 flex justify-between border border-slate-200 text-[11px]">
+                  <div><strong>Patient:</strong> {modalPt?.name} ({modalPt?.age ? `${modalPt.age}y` : "Adult"} / {modalPt?.gender || "Female"})</div>
+                  <div><strong>Phone:</strong> {modalPt?.phone}</div>
+                  <div><strong>Tooth:</strong> #{lvModal?.tooth || "N/A"}</div>
+                </div>
+
+                {lvModal && <p className="mb-2 text-[11px]"><strong>Procedure:</strong> {lvModal.procedure}</p>}
+
+                <div className="text-[11px] font-bold text-slate-700 border-b pb-1 mb-2">
+                  ℞ Therapeutic Composition / Active Salt Formulation
+                </div>
+                <div className="border border-slate-200 rounded-lg p-2.5 mb-3 bg-white space-y-2">
+                  {(lvModal?.medicines || []).map((m, i) => (
+                    <div key={i} className="pb-1.5 border-b border-dashed border-slate-200 last:border-b-0 text-[11px]">
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="font-bold text-slate-900">
+                          {i + 1}. {composition(m)}{isCombo(m) ? " — Fixed-Dose Combination" : ""}
+                        </span>
+                        <span className="font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 whitespace-nowrap">
+                          [ {doseStr(m, " — ")} ]
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">
+                        {m.timing} · {m.days} day{m.days > 1 ? "s" : ""} course
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border border-amber-300 p-3 rounded-lg bg-amber-50 mb-4 text-[10.5px]">
+                  <p className="font-bold text-amber-900 mb-1">பல் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை (Post-Treatment Care)</p>
+                  <p className="text-slate-800 whitespace-pre-line leading-relaxed">{tamilFor(lvModal?.department)}</p>
+                </div>
+
+                <div className="flex justify-between items-end pt-2 border-t border-dashed border-slate-300 text-[10px]">
+                  <div>
+                    <p className="font-bold text-slate-800">Clinical record verified</p>
+                    <p className="text-slate-500">Medicines are dispensed at the Clinic Pharmacy Counter</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="font-bold text-slate-900">Dr. Rabia, B.D.S.</p>
+                    <p className="text-[9px] text-slate-500">Dental Surgeon · Reg. No: State Dental Council</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      );
-    }
+      )}
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  </script>
+      {/* RECEPTION PRINTABLE A4 SLIP */}
+      <div id="reception-rx-sheet" style={{ fontFamily: "'Plus Jakarta Sans','Noto Sans Tamil',sans-serif", padding: 8 }}>
+        <div style={{ borderBottom: "2px solid #0f766e", paddingBottom: 10, marginBottom: 14, display: "flex", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: "#0f766e" }}>Dr. Rabia's Dental Care</div>
+            <div style={{ fontSize: 11, color: "#475569" }}>Multi-Speciality Dental Clinic & Implant Centre · Tindivanam</div>
+            <div style={{ fontSize: 10, color: "#64748b" }}>Ph: {PHONE}</div>
+          </div>
+          <div style={{ textAlign: "right", fontSize: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 700 }}>Date: {lvModal?.date || "Today"}</div>
+            <div style={{ fontFamily: "monospace" }}>Chart No: {modalPt?.chartNo}</div>
+            <div style={{ fontWeight: 700, color: "#0f766e" }}>{lvModal?.department || "Dental Surgery"}</div>
+          </div>
+        </div>
+
+        <div style={{ background: "#f8fafc", padding: 10, borderRadius: 6, marginBottom: 14, fontSize: 11, display: "flex", justifyContent: "space-between", border: "1px solid #e2e8f0" }}>
+          <div><strong>Patient:</strong> {modalPt?.name} ({modalPt?.age ? `${modalPt.age}y` : "Adult"} / {modalPt?.gender || "Female"})</div>
+          <div><strong>Phone:</strong> {modalPt?.phone}</div>
+          <div><strong>Tooth:</strong> #{lvModal?.tooth || "N/A"}</div>
+        </div>
+
+        {lvModal && <div style={{ fontSize: 11, marginBottom: 10 }}><strong>Procedure:</strong> {lvModal.procedure}</div>}
+
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#334155", borderBottom: "1px solid #e2e8f0", paddingBottom: 4, marginBottom: 8 }}>
+          ℞ Therapeutic Composition / Salt Formulation
+        </div>
+
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 6, padding: "6px 12px", marginBottom: 14 }}>
+          {(lvModal?.medicines || []).map((m, i, arr) => (
+            <div key={i} style={{ padding: "7px 0", borderBottom: i === arr.length - 1 ? "none" : "1px dashed #cbd5e1", fontSize: 11 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                <span style={{ fontWeight: 700, color: "#0f172a" }}>{i + 1}. {composition(m)}{isCombo(m) ? " — Fixed-Dose Combination" : ""}</span>
+                <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0f766e", background: "#f0fdfa", padding: "2px 6px", borderRadius: 4, border: "1px solid #ccfbf1", whiteSpace: "nowrap" }}>[ {doseStr(m, " — ")} ]</span>
+              </div>
+              <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>{m.timing} · {m.days} day{m.days > 1 ? "s" : ""} course</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ border: "1px solid #cbd5e1", padding: 10, borderRadius: 6, background: "#fefce8", marginBottom: 18 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#854d0e", marginBottom: 5 }}>பல் சிகிச்சைக்குப் பின் கவனிக்க வேண்டியவை (Post-Treatment Care)</div>
+          <div style={{ fontSize: 10.5, whiteSpace: "pre-line", lineHeight: 1.6, color: "#1e293b" }}>{tamilFor(lvModal?.department)}</div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingTop: 10, borderTop: "1px dashed #cbd5e1" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700 }}>Clinical record verified</div>
+            <div style={{ fontSize: 9, color: "#64748b" }}>Medicines are dispensed at the Clinic Pharmacy Counter</div>
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 10, fontWeight: 700 }}>Dr. Rabia, B.D.S.</div>
+            <div style={{ fontSize: 8, color: "#64748b" }}>Dental Surgeon · Reg. No: State Dental Council</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
 </body>
 </html>
