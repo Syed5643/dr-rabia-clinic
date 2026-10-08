@@ -199,10 +199,12 @@ const DEFAULT_CATS = {
     "Enucleation of Periapical Cyst"
   ],
   "Conservative Dentistry & Endodontics": [
-    "Single-Sitting Root Canal Treatment (RCT)",
     "Active Caries / Cavity (Observation)",
     "Single-Sitting Root Canal Treatment (RCT)",
     "Multi-Stage RCT (Access Prep & BMP)",
+    "Re-Root Canal Treatment (Re-RCT)",
+    "Composite Class I Restoration",
+    "Single-Sitting Root Canal Treatment (RCT)",
     "Multi-Stage RCT (Access Prep & BMP)",
     "Re-Root Canal Treatment (Re-RCT)",
     "Composite Class I Restoration",
@@ -492,33 +494,11 @@ function VisitAudioPlayer({ audioId }) {
   );
 }
 
-const INITIAL_APPOINTMENTS = [
-  { id: "apt-1", name: "Sajitha", phone: "9876543210", age: 34, gender: "Female", date: "2026-10-07", time: "11:30 AM", doctor: "Dr. Rabia", complaint: "Wisdom tooth pericoronitis", status: "Confirmed" },
-  { id: "apt-2", name: "Najuma Beevi", phone: "9363403175", age: 51, gender: "Female", date: "2026-10-07", time: "04:30 PM", doctor: "Dr. Rabia", complaint: "Crown replacement & scaling", status: "Scheduled" },
-  { id: "apt-3", name: "Deepak S", phone: "9840112233", age: 29, gender: "Male", date: "2026-10-08", time: "10:00 AM", doctor: "Dr. Rabia", complaint: "Routine clinical evaluation", status: "Scheduled" }
-];
+const INITIAL_APPOINTMENTS = [];
 
-const INITIAL_PATIENTS = [
-  { id: "p0", name: "Adhila Banu", phone: "9840123456", age: 23, gender: "Female", chartNo: "20261006_123851", medicalHistory: "None reported", allergies: [], conditions: [],
-    complaint: "Severe molar pain, lower left quadrant", status: "Ready for Rx Print",
-    dentalChart: { "38": { status: "Extracted", notes: "Odontectomy" } },
-    visits: [{ date: "06 Oct 2026", department: "Oral & Maxillofacial Surgery", procedure: "Routine Intra-Alveolar Extraction", tooth: "38", notes: "Distal impaction removed with primary closure.", medicines: [seedMed("Zerodol-SP"), seedMed("Pan-40")] }] },
-  { id: "p1", name: "Suresh Kumar", phone: "9876543210", age: 38, gender: "Male", chartNo: "20261005_202143", medicalHistory: "Mild Hypertension", allergies: ["Penicillin"], conditions: ["Hypertension"],
-    complaint: "Severe pain in lower right molar (#46)", status: "Completed",
-    dentalChart: { "46": { status: "RCT", notes: "Canal extirpation done" } },
-    visits: [{ date: "04 Oct 2026", department: "Conservative Dentistry & Endodontics", procedure: "Single-Sitting Root Canal Treatment (RCT)", tooth: "46", notes: "Biomechanical prep and obturation done.", medicines: [seedMed("Ketorol-DT")] }] },
-  { id: "p2", name: "Anita Raman", phone: "9363403175", age: 44, gender: "Female", chartNo: "20261005_193010", medicalHistory: "Type 2 Diabetic", allergies: [], conditions: ["Type 2 Diabetic"],
-    complaint: "Calculus buildup, bleeding gums", status: "Completed",
-    dentalChart: { "16": { status: "Caries", notes: "Carious cavity" } },
-    visits: [{ date: "15 Apr 2026", department: "Periodontics", procedure: "Full Mouth Ultrasonic Scaling & Polishing", tooth: "Full Mouth", notes: "Deep supragingival calculus removed.", medicines: [seedMed("Hexidine 0.2%")] }] }
-];
+const INITIAL_PATIENTS = [];
 
-const INITIAL_REMINDERS = [
-  { id: "rem-1", patientName: "Adhila Banu", phone: "9840123456", type: "Post-Op Check-in (6h)", timing: "Due at 6:00 PM", status: "Pending",
-    message: "Dr. Rabia's Dental Care: Hello Adhila, Dr. Rabia hopes you are comfortable. Avoid spitting or hot drinks today. Take prescribed medicines after food." },
-  { id: "rem-2", patientName: "Suresh Kumar", phone: "9876543210", type: "Next-Sitting Reminder", timing: "Due Tomorrow", status: "Pending",
-    message: "Dr. Rabia's Dental Care: Hello Suresh, reminder for your Tooth #46 crown sitting at 11:30 AM." }
-];
+const INITIAL_REMINDERS = [];
 
 const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
 
@@ -565,26 +545,25 @@ function App() {
   const [login, setLogin] = useState({ username: "", password: "" });
   const [loginError, setLoginError] = useState("");
   const [tab, setTab] = useState(1);
-  const [patients, setPatients] = useState(() => load("rabia_patients_v11", INITIAL_PATIENTS));
-  const [appts, setAppts] = useState(() => load("rabia_appts_v11", INITIAL_APPOINTMENTS));
-  const [reminders, setReminders] = useState(() => load("rabia_reminders_v11", INITIAL_REMINDERS));
+  const [patients, setPatients] = useState(() => load("rabia_patients_v12", INITIAL_PATIENTS));
+  const [appts, setAppts] = useState(() => load("rabia_appts_v12", INITIAL_APPOINTMENTS));
+  const [reminders, setReminders] = useState(() => load("rabia_reminders_v12", INITIAL_REMINDERS));
   const [toast, setToast] = useState(null);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(null);
   const [printModalPt, setPrintModalPt] = useState(null);
 
-  const [categories, setCategories] = useState(() => load("rabia_custom_cats_v11", DEFAULT_CATS));
+  const [categories, setCategories] = useState(() => load("rabia_custom_cats_v12", DEFAULT_CATS));
 
   const blankPt = { name: "", phone: "", age: "", gender: "Female", chartNo: "", complaint: "", allergies: "" };
   const [newPt, setNewPt] = useState(blankPt);
-  const blankApt = { name: "", phone: "", age: "", gender: "Female", date: "2026-10-07", time: "11:30 AM", doctor: "Dr. Rabia", complaint: "" };
-  const [newApt, setNewApt] = useState(blankApt);
+  const blankApt = { name: "", phone: "", age: "", gender: "Female", date: new Date().toISOString().split("T")[0], time: "11:30 AM", doctor: "Dr. Rabia", complaint: "" };  const [newApt, setNewApt] = useState(blankApt);
 
   const [op, setOp] = useState({
-    patientId: "p0",
+    patientId: "",
     department: "Oral & Maxillofacial Surgery",
     procedure: "Routine Intra-Alveolar Extraction",
-    teeth: ["38"],
+    teeth: [],
     notes: ""
   });
 
@@ -593,7 +572,55 @@ function App() {
   const [audioKey, setAudioKey] = useState(null);
   const [audioPreview, setAudioPreview] = useState(null);
   const mrRef = useRef(null), chunks = useRef([]);
-  const [custom, setCustom] = useState(() => load("rabia_custom_drugs_v11", []));
+  // --- Voice-to-Text State and Controller ---
+  const [dictating, setDictating] = useState(false);
+  const sttRef = useRef(null);
+
+  const toggleVoiceToText = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      return alert("Voice-to-text is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+    }
+
+    if (dictating) {
+      if (sttRef.current) sttRef.current.stop();
+      setDictating(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-IN"; // Configured for Indian English / Clinical terms
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => setDictating(true);
+      recognition.onend = () => setDictating(false);
+      recognition.onerror = (e) => {
+        console.error(e);
+        setDictating(false);
+        say("Voice dictation error: " + (e.error || "mic unavailable"));
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setOp(prev => ({
+            ...prev,
+            notes: prev.notes ? prev.notes + " " + transcript : transcript
+          }));
+          say("Note updated from voice");
+        }
+      };
+
+      sttRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.error(err);
+      setDictating(false);
+    }
+  };
+  const [custom, setCustom] = useState(() => load("rabia_custom_drugs_v12", []));
   const [dq, setDq] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [cd, setCd] = useState({ brandName: "", genericSalt: "", timing: "After Food" });
@@ -601,11 +628,11 @@ function App() {
 
   // Persist Data Safely
   const persist = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { setToast({ msg: "Local storage limit reached. Old logs preserved." }); } };
-  useEffect(() => persist("rabia_patients_v11", patients), [patients]);
-  useEffect(() => persist("rabia_appts_v11", appts), [appts]);
-  useEffect(() => persist("rabia_custom_drugs_v11", custom), [custom]);
-  useEffect(() => persist("rabia_reminders_v11", reminders), [reminders]);
-  useEffect(() => persist("rabia_custom_cats_v11", categories), [categories]);
+  useEffect(() => persist("rabia_patients_v12", patients), [patients]);
+  useEffect(() => persist("rabia_appts_v12", appts), [appts]);
+  useEffect(() => persist("rabia_custom_drugs_v12", custom), [custom]);
+  useEffect(() => persist("rabia_reminders_v12", reminders), [reminders]);
+  useEffect(() => persist("rabia_custom_cats_v12", categories), [categories]);
 
   const say = (msg) => { setToast({ msg }); setTimeout(() => setToast(null), 3000); };
 
@@ -699,13 +726,12 @@ function App() {
     };
 
     const chart = { ...(pt.dentalChart || {}) };
-     op.teeth.forEach(t => {
+    op.teeth.forEach(t => {
       chart[t] = {
         status: /implant/i.test(op.procedure) ? "Implant" : /rct/i.test(op.procedure) ? "RCT" : /extraction|odontectomy/i.test(op.procedure) ? "Extracted" : /caries|cavity|decay/i.test(op.procedure) ? "Caries" : "Treated",
         notes: op.procedure
       };
     });
-
     const updatedPt = {
       ...pt,
       status: "Ready for Rx Print",
@@ -727,9 +753,11 @@ function App() {
     setMeds([]);
     setAudioKey(null);
     setAudioPreview(null);
-    setOp(p => ({ ...p, patientId: pt.id, notes: "", teeth: [] }));
+    setOp(p => ({ ...p, notes: "", teeth: [] }));
     setPrintModalPt(updatedPt);
-    say("Saved & updated on Odontogram!");
+    setSel(updatedPt);
+    setTab(3); // Switch to Patients & EHR tab
+    say("Saved & transferred to reception print queue!");
   };
 
   const addPatient = (e) => {
@@ -809,9 +837,9 @@ function App() {
   );
 
   const fp = patients.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.phone.includes(q) || (p.chartNo || "").includes(q));
-  const chairPt = patients.find(p => p.id === op.patientId) || patients[0];
-  const modalPt = printModalPt || patients[0];
-  const lvModal = modalPt?.visits?.[0];
+  const chairPt = patients.find(p => p.id === op.patientId) || patients[0] || null;
+  const modalPt = printModalPt || patients[0] || null;
+  const lvModal = modalPt?.visits?.[0] || null;
 
   const alerts = (p) => p && (p.allergies?.length > 0 || p.conditions?.length > 0) && (
     <div className="rounded-lg p-3" style={{ background: "var(--dangerbg)", border: "1px solid var(--dangerln)", borderLeft: "4px solid var(--danger)" }}>
@@ -1124,7 +1152,8 @@ function App() {
                   <div>
                     <label className="lbl">Patient in chair</label>
                     <select value={op.patientId} onChange={e => setOp({ ...op, patientId: e.target.value, teeth: [] })} className="inp font-semibold">
-                      {patients.map(p => <option key={p.id} value={p.id}>{p.name} — {p.chartNo}</option>)}
+                    <option value="">{patients.length === 0 ? "-- No patients registered yet (Add in Tab 3) --" : "-- Select Patient in Chair --"}</option>
+                     {patients.map(p => <option key={p.id} value={p.id}>{p.name} — {p.chartNo}</option>)}
                     </select>
                   </div>
                   {alerts(chairPt)}
@@ -1305,9 +1334,27 @@ function App() {
                   </div>
 
                   <div>
-                    <label className="lbl">Operatory Notes (Optional)</label>
-                    <input value={op.notes} onChange={e => setOp({ ...op, notes: e.target.value })} className="inp" placeholder="e.g. Canals prepared to 21mm, temporized with Cavit" />
-                  </div>
+  <div className="flex justify-between items-center mb-1">
+    <label className="lbl">Operatory Notes (Optional)</label>
+    <button
+      type="button"
+      onClick={toggleVoiceToText}
+      className={`btn ${dictating ? "btn-rec animate-pulse" : "btn-o"}`}
+      style={{ minHeight: 28, fontSize: 11, padding: "0 10px" }}
+    >
+      <Icon n="mic" s={13} />
+      {dictating ? "Listening... (Tap to stop)" : "Speak to Dictate"}
+    </button>
+  </div>
+  <textarea
+    rows="2"
+    value={op.notes}
+    onChange={e => setOp({ ...op, notes: e.target.value })}
+    className="inp"
+    style={{ resize: "vertical" }}
+    placeholder="Type notes or tap 'Speak to Dictate' (e.g. Canals prepared to 21mm, temporized with Cavit)"
+  />
+</div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-1">
                     <button className="btn btn-p btn-lg flex-1"><Icon n="check" s={16} w={2.2} /> Complete & Send to Reception</button>
@@ -1319,8 +1366,15 @@ function App() {
 
             {/* TAB 5: REMINDERS */}
             {tab === 5 && (
-              <div className="space-y-3 max-w-4xl">
-                {reminders.map(r => (
+            <div className="space-y-3 max-w-4xl">
+              {reminders.length === 0 && (
+            <div className="card p-8 text-center text-slate-400">
+            <Icon n="bell" s={26} className="mx-auto mb-2 opacity-40" />
+            <p className="text-sm font-semibold text-slate-600">No pending reminders</p>
+            <p className="text-xs text-slate-400 mt-1">Automatic 6-hour post-op follow-ups will appear here when treatments are logged in the Operatory.</p>
+            </div>
+               )}
+             {reminders.map(r => (
                   <div key={r.id} className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={r.status === "Pending" ? { borderLeft: "4px solid #e0a93a" } : { background: "#f7f9fc" }}>
                     <div>
                       <div className="flex items-center gap-2">
@@ -1347,7 +1401,10 @@ function App() {
                 <div className="card-b space-y-4">
                   <p className="text-xs rounded-md p-2.5 select-all overflow-x-auto" style={{ background: "var(--warnbg)", border: "1px solid var(--warnln)", color: "var(--warn)" }}>{MAPS}</p>
                   <div className="divide">
-                    {patients.map(p => {
+                    {patients.length === 0 && (
+                    <p className="text-xs text-slate-400 py-6 text-center">No patients registered yet. Once patients complete their visits, review request buttons will appear here.</p>
+                      )}
+                      {patients.map(p => {
                       const t = `Hello ${p.name}, thank you for choosing Dr. Rabia's Dental Care in Tindivanam. If you had a comfortable visit, please share a quick review on Google: ${MAPS}`;
                       return (
                         <div key={p.id} className="py-3.5 flex items-center justify-between gap-3 text-xs">
