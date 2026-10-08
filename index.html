@@ -698,8 +698,7 @@ function App() {
     const chart = { ...(pt.dentalChart || {}) };
     op.teeth.forEach(t => {
       chart[t] = {
-        status: /Implant/.test(op.procedure) ? "Implant" : /RCT/.test(op.procedure) ? "RCT" : /Extraction|Odontectomy/.test(op.procedure) ? "Extracted" : /Caries|Cavity|Decay/.test(op.procedure) ? "Caries" : "Treated",
-        notes: op.procedure
+        status: /implant/i.test(op.procedure) ? "Implant" : /rct/i.test(op.procedure) ? "RCT" : /extraction|odontectomy/i.test(op.procedure) ? "Extracted" : /caries|cavity|decay/i.test(op.procedure) ? "Caries" : "Treated",        notes: op.procedure
       };
     });
 
