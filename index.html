@@ -740,14 +740,16 @@ function App() {
     };
 
     setPatients(patients.map(p => p.id === pt.id ? updatedPt : p));
+    const dueTime = new Date(Date.now() + 6 * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     setReminders([{
       id: "rem_" + Date.now(),
       patientName: pt.name,
       phone: pt.phone,
-      type: "Post-Op Follow-up (Auto)",
-      timing: "Scheduled +6h",
+      type: "Post-Op Evening Check-in",
+      timing: `Due at ${dueTime} (Post-Op Check)`,
       status: "Pending",
-      message: `Dr. Rabia's Dental Care: Hello ${pt.name}, Dr. Rabia hopes you are recovering well from your ${op.procedure} (Tooth #${tooth}). Please follow the care instructions given.`
+      message: `Dr. Rabia's Dental Care: Hello ${pt.name}, Dr. Rabia hopes you are comfortable after your ${op.procedure} (Tooth #${tooth}). Please take your prescribed medicines after food tonight. Avoid spitting or hot drinks. If you have any severe pain or bleeding, contact us at ${PHONE}.`
     }, ...reminders]);
 
     setMeds([]);
@@ -812,7 +814,8 @@ function App() {
     setTab(3);
   };
 
-  const wa = (phone, text) => {
+  const wa = (phone, text, id) => {
+    if (id) setReminders(reminders.map(r => r.id === id ? { ...r, status: "Sent", timing: "Sent just now" } : r));
     const p = phone.replace(/\D/g, "");
     window.open(`https://wa.me/${p.length === 10 ? "91" + p : p}?text=${encodeURIComponent(text)}`, "_blank");
   };
@@ -1387,8 +1390,7 @@ function App() {
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <button onClick={() => sms(r.phone, r.message, r.id)} className="btn btn-d"><Icon n="send" s={13} /> SMS</button>
-                      <button onClick={() => wa(r.phone, r.message)} className="btn btn-ok"><Icon n="message" s={13} /> WhatsApp</button>
-                    </div>
+                      <button onClick={() => wa(r.phone, r.message, r.id)} className="btn btn-ok"><Icon n="message" s={13} /> WhatsApp</button>                    </div>
                   </div>
                 ))}
               </div>
