@@ -200,6 +200,9 @@ const DEFAULT_CATS = {
   ],
   "Conservative Dentistry & Endodontics": [
     "Single-Sitting Root Canal Treatment (RCT)",
+    "Active Caries / Cavity (Observation)",
+    "Single-Sitting Root Canal Treatment (RCT)",
+    "Multi-Stage RCT (Access Prep & BMP)",
     "Multi-Stage RCT (Access Prep & BMP)",
     "Re-Root Canal Treatment (Re-RCT)",
     "Composite Class I Restoration",
@@ -696,9 +699,10 @@ function App() {
     };
 
     const chart = { ...(pt.dentalChart || {}) };
-    op.teeth.forEach(t => {
+     op.teeth.forEach(t => {
       chart[t] = {
-        status: /implant/i.test(op.procedure) ? "Implant" : /rct/i.test(op.procedure) ? "RCT" : /extraction|odontectomy/i.test(op.procedure) ? "Extracted" : /caries|cavity|decay/i.test(op.procedure) ? "Caries" : "Treated",        notes: op.procedure
+        status: /implant/i.test(op.procedure) ? "Implant" : /rct/i.test(op.procedure) ? "RCT" : /extraction|odontectomy/i.test(op.procedure) ? "Extracted" : /caries|cavity|decay/i.test(op.procedure) ? "Caries" : "Treated",
+        notes: op.procedure
       };
     });
 
@@ -723,10 +727,9 @@ function App() {
     setMeds([]);
     setAudioKey(null);
     setAudioPreview(null);
-    setOp(p => ({ ...p, notes: "", teeth: [] }));
+    setOp(p => ({ ...p, patientId: pt.id, notes: "", teeth: [] }));
     setPrintModalPt(updatedPt);
-    setTab(3); // Switch to Patients & EHR tab
-    say("Saved & transferred to reception print queue!");
+    say("Saved & updated on Odontogram!");
   };
 
   const addPatient = (e) => {
